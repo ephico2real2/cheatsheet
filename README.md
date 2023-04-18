@@ -1,11 +1,13 @@
 # cheatsheet
 
-`` export HPA into CSV ``
+`` One-liner command to export HPA into CSV ``
 
 
 ```bash
 
-echo "NAMESPACE,HPA,MIN,MAX" > hpa_list.csv && oc get hpa --all-namespaces -o custom-columns="NAMESPACE:.metadata.namespace,HPA:.metadata.name,MIN:.spec.minReplicas,MAX:.spec.maxReplicas" --no-headers | awk 'BEGIN {OFS=","} {print $1,$2,$3,$4}' >> hpa_list.csv
+echo "NAMESPACE,HPA,MIN,MAX" > hpa_list.csv && oc get hpa --all-namespaces -o \
+custom-columns="NAMESPACE:.metadata.namespace,HPA:.metadata.name,MIN:.spec.minReplicas,MAX:.spec.maxReplicas" \
+--no-headers | awk 'BEGIN {OFS=","} {print $1,$2,$3,$4}' >> hpa_list.csv
 
 
 ```
