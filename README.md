@@ -5,15 +5,16 @@
 
 ```bash
 
-oc get hpa --all-namespaces -o custom-columns="NAMESPACE:.metadata.namespace,HPA:.metadata.name,MIN:.spec.minReplicas,MAX:.spec.maxReplicas" --no-headers | awk 'BEGIN {OFS=","} {print $1,$2,$3,$4}' > hpa_list.csv
+echo "NAMESPACE,HPA,MIN,MAX" > hpa_list.csv && oc get hpa --all-namespaces -o custom-columns="NAMESPACE:.metadata.namespace,HPA:.metadata.name,MIN:.spec.minReplicas,MAX:.spec.maxReplicas" --no-headers | awk 'BEGIN {OFS=","} {print $1,$2,$3,$4}' >> hpa_list.csv
 
 
 ```
-
 
 ```
 
 The oc command used to get the list of Horizontal Pod Autoscalers (HPAs), along with their minimum and maximum replica counts in all namespaces, and output the information in CSV format:
+
+echo "NAMESPACE,HPA,MIN,MAX" > adding headers
 
 oc get hpa --all-namespaces: List all HPAs in all namespaces using the oc command. The oc command is the OpenShift CLI tool, which is compatible with OpenShift 4.x and can be used as a drop-in replacement for kubectl.
 
