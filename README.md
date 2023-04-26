@@ -82,3 +82,6 @@ fi
 
 ```
 
+`` chmod +x find_pvc.sh ``
+
+`` ./find_pvc.sh <PVC_NAME> ``
