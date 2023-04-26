@@ -32,3 +32,15 @@ After running this command, you'll have a file named "hpa_list.csv" with the des
 
 
 ```
+
+
+`` one liner to get pvc name ``
+
+```
+
+oc get deployments -A -o json | jq -r '.items[] | select(.spec.template.spec.volumes[]? | .persistentVolumeClaim.claimName=="<PVC_NAME>") | .metadata.namespace + "/" + .metadata.name + " -> " + "<PVC_NAME>"'
+
+oc get deploymentconfigs -A -o json | jq -r '.items[] | select(.spec.template.spec.volumes[]? | .persistentVolumeClaim.claimName=="<PVC_NAME>") | .metadata.namespace + "/" + .metadata.name + " -> " + "<PVC_NAME>"'
+
+
+```
