@@ -44,3 +44,41 @@ oc get deploymentconfigs -A -o json | jq -r '.items[] | select(.spec.template.sp
 
 
 ```
+
+
+```bash
+
+#!/bin/bash
+
+PVC_NAME="$1"
+
+if [ -z "$PVC_NAME" ]; then
+  echo "Usage: $0 <PVC_NAME>"
+  exit 1
+fi
+
+echo "Searching for resources using PVC: $PVC_NAME"
+echo "---------------------------------------------"
+
+DEPLOYMENTS=$(oc get deployments -A -o json | jq -r --arg PVC_NAME "$PVC_NAME" '.items[] | select(.spec.template.spec.volumes[]? | .persistentVolumeClaim.claimName==$PVC_NAME) | "Namespace: " + .metadata.namespace + "\nDeployment: " + .metadata.name + "\n"')
+DEPLOYMENTCONFIGS=$(oc get deploymentconfigs -A -o json | jq -r --arg PVC_NAME "$PVC_NAME" '.items[] | select(.spec.template.spec.volumes[]? | .persistentVolumeClaim.claimName==$PVC_NAME) | "Namespace: " + .metadata.namespace + "\nDeploymentConfig: " + .metadata.name + "\n"')
+
+if [ -n "$DEPLOYMENTS" ]; then
+  echo "Deployments:"
+  echo "-------------"
+  echo -e "$DEPLOYMENTS"
+fi
+
+if [ -n "$DEPLOYMENTCONFIGS" ]; then
+  echo "DeploymentConfigs:"
+  echo "-------------------"
+  echo -e "$DEPLOYMENTCONFIGS"
+fi
+
+if [ -z "$DEPLOYMENTS" ] && [ -z "$DEPLOYMENTCONFIGS" ]; then
+  echo "No Deployments or DeploymentConfigs found using the specified PVC."
+fi
+
+
+```
+
