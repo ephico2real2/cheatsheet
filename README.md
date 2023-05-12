@@ -85,3 +85,31 @@ fi
 `` chmod +x find_pvc.sh ``
 
 `` ./find_pvc.sh <PVC_NAME> ``
+
+
+`` on liner to get events ``
+
+
+```bash
+cat << EOF> get_all_events.sh
+#!/bin/bash
+
+# Get a list of all namespaces
+namespaces=$(oc get ns -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+
+# Output file
+output_file="events_count.csv"
+
+# Write the header to the CSV file
+echo "NAMESPACES,EVENTS COUNT" > $output_file
+
+# Loop through namespaces and count the events
+for ns in $namespaces
+do
+    count=$(oc get events -n $ns --no-headers | wc -l)
+    echo "$ns,$count" >> $output_file
+done
+EOF
+
+
+```
