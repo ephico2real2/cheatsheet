@@ -1,4 +1,6 @@
-Absolutely, let's update the tutorial with the Kubeconfig usage:
+## Install basic argocd server in kubernetes kind.
+
+https://codefresh.io/learn/argo-cd/?utm_source=google&utm_medium=ppc&utm_campaign=google_argo_always_on&utm_content=learning_center_sitelink&utm_term=argocd&hsa_acc=5584137208&hsa_cam=14910114152&hsa_grp=127746244709&hsa_ad=579695228773&hsa_src=g&hsa_tgt=kwd-893432256198&hsa_kw=argocd&hsa_mt=b&hsa_net=adwords&hsa_ver=3&gclid=CjwKCAjwp6CkBhB_EiwAlQVyxcMdCJ677w_2n8rtOsyYUnjMWLck3eXaAqftd_Mz-znfiEVsyLnI3BoCR2YQAvD_BwE
 
 ## Step 1: Install the ArgoCD CLI
 
