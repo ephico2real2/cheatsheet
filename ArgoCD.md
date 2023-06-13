@@ -69,6 +69,7 @@ argocd login <argo_server>
 Once authenticated, you can run ArgoCD admin commands. To export all ArgoCD data, use:
 
 ```bash
+# https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd_admin/
 
 argocd admin export
 
