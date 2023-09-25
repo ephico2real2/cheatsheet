@@ -1,10 +1,14 @@
 #!/bin/bash
+ 
+### Pattern =>  EXCLUDE_PATTERN="^openshift.*|^kube.*|^logscale.*"  (If you intend to exclude namespaces that specifically start with those prefixes, you can modify the pattern accordingly:)
+### EXCLUDE_PATTERN="^test-.*|.*-dev$" (Exclude namespaces that either start with "test-" or end with "-dev":)
+
 
 # Configurations
 ROLEBINDING_NAME="your-rolebinding-name"
 TEMPLATE_NAME="your-template-name"
 TEMPLATE_PARAMETERS="--param=KEY=VALUE"  # If NAMESPACE is a parameter, specify it here.
-EXCLUDE_PATTERN="exclude-pattern-*"
+EXCLUDE_PATTERN="exclude-pattern-*"   
 LOG_FILE="script_log.txt"
 
 # Function to log messages with timestamps
