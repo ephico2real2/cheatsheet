@@ -40,6 +40,14 @@ subjects:
 
 ```
 
+
+## commands to check
+
 `` oc get namespace -l demo.com/mnemonic=jnk -o jsonpath='{.items[*].metadata.name}' | xargs -I {} oc get pods -n {} ``
+
+
+####
+
+
 
 
