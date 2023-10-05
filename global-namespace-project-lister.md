@@ -54,9 +54,9 @@ done
 
 ```
 
-`` oc get namespace -l demo.com/mnemonic=jnk -o custom-columns=NAME:.metadata.name --no-headers | while read ns; do oc get pods -n $ns; done ``
+#### using while
 
-####
+`` oc get namespace -l demo.com/mnemonic=jnk -o custom-columns=NAME:.metadata.name --no-headers | while read ns; do oc get pods -n $ns; done ``
 
 
 
