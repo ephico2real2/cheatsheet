@@ -1,6 +1,6 @@
-``  global-project-and-namespace-lister ``
+``  global-project-and-namespace-lister.yaml ``
 
-```
+```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -23,9 +23,9 @@ rules:
 
 ```
 
-`` global-jnk-svc-admin-binding ``
+`` global-jnk-svc-admin-binding.yaml  ``
 
-```
+```yaml
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
