@@ -41,9 +41,18 @@ subjects:
 ```
 
 
-## commands to check
+`` ## commands to check ``
 
 `` oc get namespace -l demo.com/mnemonic=jnk -o jsonpath='{.items[*].metadata.name}' | xargs -I {} oc get pods -n {} ``
+
+`` # Iterate over namespaces with the matching label and get pods in each ``
+
+```
+for ns in $(oc get namespace -l demo.com/mnemonic=jnk -o jsonpath='{.items[*].metadata.name}'); do
+   oc get pods -n $ns
+done
+
+```
 
 
 ####
