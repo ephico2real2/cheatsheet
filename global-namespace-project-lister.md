@@ -11,14 +11,12 @@ rules:
   resources:
   - namespaces
   verbs:
-  - list
   - get
 - apiGroups:
   - project.openshift.io
   resources:
   - projects
   verbs:
-  - list
   - get
 
 ```
@@ -41,4 +39,7 @@ subjects:
   namespace: ocp-automation
 
 ```
+
+`` oc get namespace -l demo.com/mnemonic=jnk -o jsonpath='{.items[*].metadata.name}' | xargs -I {} oc get pods -n {} ``
+
 
