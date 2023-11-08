@@ -1,4 +1,4 @@
-'''yaml
+```yaml
 
 kubectl get clusterrolebindings -o=json | jq -r '
   .items[]
@@ -9,4 +9,4 @@ kubectl get clusterrolebindings -o=json | jq -r '
   | .roleRef.name
 '
 
-'''
+```
