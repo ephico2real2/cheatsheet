@@ -1,3 +1,5 @@
+```
+
 variable "ecs_cluster_arn" {
   description = "ARN of the ECS cluster"
   type        = string
@@ -93,6 +95,7 @@ resource "aws_iam_role_policy_attachment" "ecs_tasks_attach" {
   policy_arn = aws_iam_policy.ecs_tasks_policy.arn
 }
 
+```
 
 
 
