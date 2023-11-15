@@ -31,21 +31,20 @@ if [ $? -ne 0 ]; then
 fi
 
 # Initialize the patch JSON array
-PATCH="["
+PATCH="[]"
 
-# Find the indexes of subjects to remove and build the patch
+# Iterate over the subjects to construct the patch for removal
 for subject_to_remove in "${SUBJECTS_TO_REMOVE[@]}"; do
-  # Using jq to iterate over the subjects and select the ones to remove that are of kind 'Group'
-  while IFS= read -r index; do
-    PATCH="${PATCH}{\"op\": \"remove\", \"path\": \"/subjects/${index}\"},"
-  done < <(echo "${CRB_JSON}" | jq -r --arg NAME "$subject_to_remove" '.subjects | to_entries | .[] | select(.value.kind == "Group" and .value.name | split(":") | .[-1] | contains($NAME)) | .key')
+  # Build an array of subject indices to remove
+  SUBJECT_INDICES_TO_REMOVE=($(echo "${CRB_JSON}" | jq -r --arg NAME "$subject_to_remove" '.subjects | to_entries | .[] | select(.value.kind == "Group" and (.value.name | split(":")[-1] == $NAME)).key'))
+
+  # Add remove operations for each matched subject
+  for index in "${SUBJECT_INDICES_TO_REMOVE[@]}"; do
+    PATCH=$(echo "$PATCH" | jq --arg INDEX "$index" '. + [{"op": "remove", "path": "/subjects/" + $INDEX}]')
+  done
 done
 
-# Remove the trailing comma and close the array if needed
-PATCH=$(echo "$PATCH" | sed 's/,$//')
-PATCH="${PATCH}]"
-
-# Apply the patch if not empty
+# Apply the patch if there are operations to perform
 if [ "$PATCH" != "[]" ]; then
   oc patch clusterrolebinding "$CRB_NAME" --type='json' -p="$PATCH"
   if [ $? -eq 0 ]; then
