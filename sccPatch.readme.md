@@ -39,8 +39,10 @@ for subject_to_remove in "${SUBJECTS_TO_REMOVE[@]}"; do
   PATCH=$(echo "${CRB_JSON}" | jq --arg NAME "$subject_to_remove" --argjson PATCH "$PATCH" '.subjects | to_entries | map(select(.value.kind == "Group" and (.value.name | split(":")[1] == $NAME) | not)) | map(.value) | add | $PATCH + map({"op": "remove", "path": "/subjects/-"})')
 done
 
-# Create a temporary file for the patch
-PATCH_FILE=$(mktemp)
+# ... [earlier parts of the script remain unchanged]
+
+# Create a temporary file for the patch with a .json extension
+PATCH_FILE=$(mktemp /tmp/ocpatch.XXXXXX.json)
 if [ ! -f "$PATCH_FILE" ]; then
     echo "Failed to create a temporary file for the patch. Exiting."
     exit 5
@@ -53,7 +55,7 @@ echo "$PATCH" > "$PATCH_FILE"
 if [ "$PATCH" != "[]" ]; then
   oc patch clusterrolebinding "$CRB_NAME" --type='json' --patch-file="$PATCH_FILE"
   PATCH_RESULT=$?
-  rm -f "$PATCH_FILE"
+  #rm -f "$PATCH_FILE"
   if [ $PATCH_RESULT -eq 0 ]; then
     echo "ClusterRoleBinding $CRB_NAME modified."
   else
