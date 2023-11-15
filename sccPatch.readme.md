@@ -30,23 +30,20 @@ if [ $? -ne 0 ]; then
     exit 3
 fi
 
+# ... [The earlier part of the script remains unchanged]
+
 # Initialize the patch JSON array
 PATCH="[]"
 
 # Iterate over the subjects to construct the patch for removal
 for subject_to_remove in "${SUBJECTS_TO_REMOVE[@]}"; do
-  # Build an array of subject indices to remove
-  SUBJECT_INDICES_TO_REMOVE=($(echo "${CRB_JSON}" | jq -r --arg NAME "$subject_to_remove" '.subjects | to_entries | .[] | select(.value.kind == "Group" and (.value.name | split(":")[-1] == $NAME)).key'))
-
-  # Add remove operations for each matched subject
-  for index in "${SUBJECT_INDICES_TO_REMOVE[@]}"; do
-    PATCH=$(echo "$PATCH" | jq --arg INDEX "$index" '. + [{"op": "remove", "path": "/subjects/" + $INDEX}]')
-  done
+  # Build the JSON patch array
+  PATCH=$(echo "${CRB_JSON}" | jq --arg NAME "$subject_to_remove" '.subjects | to_entries | map(select(.value.kind == "Group" and (.value.name | split(":")[1] == $NAME) | not)) | map(.value)')
 done
 
 # Apply the patch if there are operations to perform
 if [ "$PATCH" != "[]" ]; then
-  oc patch clusterrolebinding "$CRB_NAME" --type='json' -p="$PATCH"
+  echo "$PATCH" | oc patch clusterrolebinding "$CRB_NAME" --type='json' --patch-file=-
   if [ $? -eq 0 ]; then
     echo "ClusterRoleBinding $CRB_NAME modified."
   else
