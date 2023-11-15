@@ -38,7 +38,7 @@ for subject_to_remove in "${SUBJECTS_TO_REMOVE[@]}"; do
   # Using jq to iterate over the subjects and select the ones to remove that are of kind 'Group'
   while IFS= read -r index; do
     PATCH="${PATCH}{\"op\": \"remove\", \"path\": \"/subjects/${index}\"},"
-  done < <(echo "${CRB_JSON}" | jq -r --arg NAME "$subject_to_remove" '.subjects | to_entries | .[] | select(.value.kind == "Group" and .value.name | contains($NAME)) | .key')
+  done < <(echo "${CRB_JSON}" | jq -r --arg NAME "$subject_to_remove" '.subjects | to_entries | .[] | select(.value.kind == "Group" and .value.name | split(":") | .[-1] | contains($NAME)) | .key')
 done
 
 # Remove the trailing comma and close the array if needed
