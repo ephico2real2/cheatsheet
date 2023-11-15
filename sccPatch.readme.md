@@ -35,14 +35,26 @@ PATCH="[]"
 
 # Iterate over the subjects to construct the patch for removal
 for subject_to_remove in "${SUBJECTS_TO_REMOVE[@]}"; do
-  # Build the JSON patch array
+  # Filter out the subjects that are of the specified kind and match the name pattern
   PATCH=$(echo "${CRB_JSON}" | jq --arg NAME "$subject_to_remove" --argjson PATCH "$PATCH" '.subjects | to_entries | map(select(.value.kind == "Group" and (.value.name | split(":")[1] == $NAME) | not)) | map(.value) | add | $PATCH + map({"op": "remove", "path": "/subjects/-"})')
 done
 
-# Apply the patch if there are operations to perform
+# Create a temporary file for the patch
+PATCH_FILE=$(mktemp)
+if [ ! -f "$PATCH_FILE" ]; then
+    echo "Failed to create a temporary file for the patch. Exiting."
+    exit 5
+fi
+
+# Write the patch to the temporary file
+echo "$PATCH" > "$PATCH_FILE"
+
+# Apply the patch using the temporary file
 if [ "$PATCH" != "[]" ]; then
-  echo "$PATCH" | oc patch clusterrolebinding "$CRB_NAME" --type='json' -p -
-  if [ $? -eq 0 ]; then
+  oc patch clusterrolebinding "$CRB_NAME" --type='json' --patch-file="$PATCH_FILE"
+  PATCH_RESULT=$?
+  rm -f "$PATCH_FILE"
+  if [ $PATCH_RESULT -eq 0 ]; then
     echo "ClusterRoleBinding $CRB_NAME modified."
   else
     echo "Failed to patch ClusterRoleBinding. Exiting."
