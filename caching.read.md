@@ -1,5 +1,9 @@
-```
+# Pipeline ideas
 
+[] Reference: https://codefresh.io/docs/docs/example-catalog/ci-examples/spring-boot-2/
+
+
+```
 In practice, this means that you need to look at the documentation of your build system and test framework and make sure that all folders you want cached are placed under the Codefresh volume.
 
 This is a typical pattern with Java applications.
@@ -13,7 +17,7 @@ For Rust pass an environment variable CARGO_HOME=/codefresh/volume/cargo to the 
 
 ```
 
-```
+```bash
 The example Java project
 You can see the example project at https://github.com/codefresh-contrib/spring-boot-2-sample-app. The repository contains a Spring Boot 2 project built with Maven with the following goals:
 
@@ -28,7 +32,7 @@ Dockerfile.only-package
 
 ```
 
-```
+```bash
 FROM java:8-jre-alpine
 
 EXPOSE 8080
@@ -42,7 +46,7 @@ HEALTHCHECK --interval=1m --timeout=3s CMD wget -q -T 3 -s http://localhost:8080
 
 ```
 
-```
+```bash
 This means that before building the Docker image, the compilation step (mvn package) is expected to be finished already. Therefore, in the codefresh.yml file we need at least two steps. The first one should prepare the JAR file and the second one should create the Docker image.
 
 Create a CI pipeline for Spring
@@ -54,7 +58,7 @@ codefresh-package-only.yml
 
 ```
 
-```
+```yaml
 version: '1.0'
 stages:
   - prepare
@@ -104,7 +108,12 @@ steps:
 
 ```
 
+```bash
+Notice that because the Maven lifecycle also executes the previous steps in a build, the mvn verify command essentially will run mvn package as well. In theory we could just have the Integration step in this pipeline on its own. That step would build the code, run unit and integration tests all in one stage. For demonstration purposes however, we include two steps so that you can see the correct usage of Maven cache.
 ```
+
+
+```bash
 Spring Boot 2 and Docker (multi-stage builds)
 Docker added multi-stage builds at version 17.05. With multi-stage builds a Docker build can use one base image for compilation/packaging/unit tests and a different one that will hold the runtime of the application. This makes the final image more secure and smaller in size (as it does not contain any development/debugging tools).
 
@@ -115,7 +124,7 @@ Here is the multi-stage build definition:
 Dockerfile
 ```
 
-```
+```yaml
 FROM maven:3.5.2-jdk-8-alpine AS MAVEN_TOOL_CHAIN
 COPY pom.xml /tmp/
 RUN mvn -B dependency:go-offline -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml
@@ -134,7 +143,7 @@ ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring
 
 ```
 
-```
+```bash
 This docker build does the following:
 
 Starts from the standard Maven Docker image
@@ -150,14 +159,14 @@ Again, we define a custom location for the Maven cache (using the settings-docke
 
 ```
 
-```
+```bash
 Create a CI pipeline for Spring (multi-stage Docker builds)
 Because in multi-stage builds Docker itself handles most of the build process, moving the project to Codefresh is straightforward. We just need a single step that creates the Docker image after checking out the code. The integration test step is the same as before.
 
 
 ```
 
-```
+```yaml
 version: '1.0'
 stages:
   - prepare
@@ -199,5 +208,5 @@ steps:
         commands:
           - "curl http://my-spring-app:8080/"
 
-
 ```
+
