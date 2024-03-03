@@ -1,6 +1,8 @@
 ```
 
-In practice, this means that you need to look at the documentation of your build system and test framework and make sure that all folders you want cached are placed under the Codefresh volume. This is a typical pattern with Java applications.
+In practice, this means that you need to look at the documentation of your build system and test framework and make sure that all folders you want cached are placed under the Codefresh volume.
+
+This is a typical pattern with Java applications.
 
 For Maven use mvn -Dmaven.repo.local=/codefresh/volume/m2_repository package as shown in the example.
 For Gradle use gradle -g /codefresh/volume/.gradle -Dmaven.repo.local=/codefresh/volume/m2 as explained in the example.
