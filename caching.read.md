@@ -2,6 +2,7 @@
 
 [] Reference: https://codefresh.io/docs/docs/example-catalog/ci-examples/spring-boot-2/
 
+[] https://myjavaadventures.com/blog/2019/12/11/maven-with-docker/
 
 ```
 In practice, this means that you need to look at the documentation of your build system and test framework and make sure that all folders you want cached are placed under the Codefresh volume.
