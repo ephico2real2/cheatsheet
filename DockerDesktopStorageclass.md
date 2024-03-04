@@ -1,3 +1,5 @@
+```
+
 apiVersion: v1
 kind: StorageClass 
 apiVersion: storage.k8s.io/v1beta1 
@@ -5,9 +7,10 @@ metadata:
   name: hostpath
 provisioner: docker.io/hostpath
 
-
+```
 ---------------
 
+```
 #
 # PersistentVolume
 #
@@ -27,7 +30,9 @@ spec:
     path: /tmp
   persistentVolumeReclaimPolicy: Retain
 
+```
 
+```
   --------
 #
 # PersistentVolumeClaim
@@ -44,3 +49,4 @@ spec:
     requests:
       storage: 256Mi
   
+```
