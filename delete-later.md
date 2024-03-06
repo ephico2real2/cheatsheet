@@ -1,3 +1,5 @@
+```
+        
         stage('Build Web Image') {
             when {
                 anyOf { branch 'dev'; branch 'prod' }
@@ -25,7 +27,7 @@
 
         kanikoBuildImage('dev/web/Dockerfile', 'web-portal', "${env.GIT_COMMIT.take(7)}", "build_type=${env.BUILDTYPE}")
 
-
+```
 
 ######
 
@@ -79,6 +81,8 @@ def gitCommitAndPush(String repoDirectory) {
         }
     }
 }
+
+```
 
 ```
 ### for loop
