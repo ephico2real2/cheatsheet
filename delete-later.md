@@ -29,7 +29,7 @@
 
 ######
 
-
+```
 def cloneRepository(String repoDirectory) {
     try {
         echo "Cloning repository from ${env.HELM_MANIFEST_REPO} into ${repoDirectory}"
@@ -79,6 +79,8 @@ def gitCommitAndPush(String repoDirectory) {
         }
     }
 }
+
+```
 
 
 
