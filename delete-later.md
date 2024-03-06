@@ -85,7 +85,7 @@ def gitCommitAndPush(String repoDirectory) {
 ```
 
 ```
-### for loop
+// ### for loop
 
 def deployToEnvironment(String environmentPart, String[] regions) {
     def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
