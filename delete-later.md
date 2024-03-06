@@ -80,6 +80,7 @@ def gitCommitAndPush(String repoDirectory) {
     }
 }
 
+```
 ### for loop
 
 def deployToEnvironment(String environmentPart, String[] regions) {
@@ -100,6 +101,10 @@ def deployToEnvironment(String environmentPart, String[] regions) {
         gitCommitAndPush(repoDirectory)
     }
 }
+
+```
+
+```
 
 def updateHelmValues(String fileName, String valuesPath) {
     sh "yq eval '.image.tag = \"${env.IMAGE_TAG}\"' -i ${valuesPath}/${fileName}"
