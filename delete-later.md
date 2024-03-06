@@ -138,6 +138,31 @@ deployToEnvironment('dev', ['euw2', 'use1'])
 
 ```
 
+```bash
 
+// Testing
+
+def deployToEnvironment(String environmentPart, String regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    cloneRepository(repoDirectory)
+    
+    def regionList = regions.tokenize(',')
+    
+    dir(repoDirectory) {
+        regionList.each { regionPart ->
+            def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
+            def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
+
+            // Update Helm values for web and queue for each region
+            updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
+            updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
+        }
+
+        // After all updates are done for each region, commit and push
+        gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+    }
+}
+
+```
 
 
