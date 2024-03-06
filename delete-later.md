@@ -80,6 +80,34 @@ def gitCommitAndPush(String repoDirectory) {
     }
 }
 
+### for loop
+
+
+If you want to ensure that the gitCommitAndPush function is called only after all the values.yaml files for each region and environment have been updated, you can structure your deployToEnvironment function in such a way that it iterates over all the regions, updates the files for each, and only after all updates are done, proceeds to commit and push the changes.
+
+Here's an example of how you could structure this:
+
+groovy
+Copy code
+def deployToEnvironment(String environmentPart, String[] regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    cloneRepository(repoDirectory)
+
+    dir(repoDirectory) {
+        regions.each { regionPart ->
+            def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
+            def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
+
+            // Update Helm values for web and queue for each region
+            updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
+            updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
+        }
+
+        // After all updates are done for each region, commit and push
+        gitCommitAndPush(repoDirectory)
+    }
+}
+
 ```
 
 
