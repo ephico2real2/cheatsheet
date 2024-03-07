@@ -301,13 +301,13 @@ def deployToEnvironment(String environmentPart, String regions) {
                 if (!fileExists("${env.VALUES_PATH_WEB}/${fileNameWeb}")) {
                     echo "WARNING: File ${env.VALUES_PATH_WEB}/${fileNameWeb} does not exist. Skipping update for this file."
                 } else {
-                    updateHelmValues(fileNameWeb, env.VALIES_PATH_WEB)
+                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
                 }
 
                 if (!fileExists("${env.VALUES_PATH_QUEUE}/${fileNameQueue}")) {
                     echo "WARNING: File ${env.VALUES_PATH_QUEUE}/${fileNameQueue} does not exist. Skipping update for this file."
                 } else {
-                    updateHelmValues(fileNameQueue, env.VALIES_PATH_QUEUE)
+                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
                 }
             }
 
