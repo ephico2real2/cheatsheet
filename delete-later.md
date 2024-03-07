@@ -163,6 +163,26 @@ def deployToEnvironment(String environmentPart, String regions) {
     }
 }
 
+
+//
+
+steps {
+    script {
+        def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+        ['sbox', 'dev'].each { envName ->
+            sshagent(['django-github-k8s']) {
+                container('aws') {
+                    regionsList.each { region ->
+                        echo "Deploying ${envName} to region ${region}"
+                        deployToEnvironment(envName, [region]) // Pass region in a list if required
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 ```
 
 
