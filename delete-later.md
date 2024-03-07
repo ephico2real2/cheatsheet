@@ -266,3 +266,22 @@ def deployToEnvironment(String environmentPart, String regions) {
 ```
 
 
+```
+steps {
+    script {
+        sshagent(['django-github-k8s']) {
+            container('aws') {
+                def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+                regionsList.each { region ->
+                    echo "Deploying to stage in region ${region}"
+                    deployToEnvironment('stage', region)
+                }
+            }
+        }
+    }
+}
+
+
+```
+
+
