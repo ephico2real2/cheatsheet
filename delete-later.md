@@ -185,4 +185,39 @@ steps {
 
 ```
 
+```
+def deployToEnvironment(String environmentPart, String regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    try {
+        setGitConfig() // Ensuring git configuration is set
+        cloneRepository(repoDirectory)
+
+        def regionList = regions.tokenize(',')
+
+        dir(repoDirectory) {
+            regionList.each { regionPart ->
+                try {
+                    def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
+                    def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
+
+                    // Attempt to update Helm values for web and queue for each region
+                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
+                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
+                } catch (Exception e) {
+                    echo "An error occurred while processing region ${regionPart}: ${e.message}"
+                    // No throw statement here; log and continue with the next region
+                }
+            }
+
+            // Attempt to commit and push changes even if there were errors in previous steps
+            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+        }
+    } catch (Exception e) {
+        echo "An error occurred during deployment: ${e.message}"
+        // No re-throwing the exception here to allow the pipeline to continue
+    }
+}
+
+```
+
 
