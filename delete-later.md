@@ -1,4 +1,18 @@
 ```
+        stage('Wait for Agent') {
+            steps {
+                script {
+                    // Wait for the Kubernetes pod to be ready
+                    sleep(time: 30, unit: 'SECONDS')
+                }
+            }
+        }
+```
+
+
+
+
+```
         
         stage('Build Web Image') {
             when {
