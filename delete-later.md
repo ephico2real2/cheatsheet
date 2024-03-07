@@ -288,7 +288,7 @@ steps {
 def deployToEnvironment(String environmentPart, String regions) {
     def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
     try {
-        setGitConfig()
+        setupGitConfig()
         cloneRepository(repoDirectory)
 
         def regionList = regions.tokenize(',')
@@ -311,7 +311,8 @@ def deployToEnvironment(String environmentPart, String regions) {
                 }
             }
 
-            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+            //gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+             //gitCommitAndPush(repoDirectory)
         }
     } catch (Exception e) {
         echo "An error occurred during deployment: ${e.message}. Continuing with the pipeline."
