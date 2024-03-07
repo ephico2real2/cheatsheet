@@ -284,4 +284,40 @@ steps {
 
 ```
 
+```bash
+def deployToEnvironment(String environmentPart, String regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    try {
+        setGitConfig()
+        cloneRepository(repoDirectory)
+
+        def regionList = regions.tokenize(',')
+
+        dir(repoDirectory) {
+            regionList.each { regionPart ->
+                def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
+                def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
+
+                if (!fileExists("${env.VALUES_PATH_WEB}/${fileNameWeb}")) {
+                    echo "WARNING: File ${env.VALUES_PATH_WEB}/${fileNameWeb} does not exist. Skipping update for this file."
+                } else {
+                    updateHelmValues(fileNameWeb, env.VALIES_PATH_WEB)
+                }
+
+                if (!fileExists("${env.VALUES_PATH_QUEUE}/${fileNameQueue}")) {
+                    echo "WARNING: File ${env.VALUES_PATH_QUEUE}/${fileNameQueue} does not exist. Skipping update for this file."
+                } else {
+                    updateHelmValues(fileNameQueue, env.VALIES_PATH_QUEUE)
+                }
+            }
+
+            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+        }
+    } catch (Exception e) {
+        echo "An error occurred during deployment: ${e.message}. Continuing with the pipeline."
+    }
+}
+
+
+```
 
