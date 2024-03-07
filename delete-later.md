@@ -221,3 +221,48 @@ def deployToEnvironment(String environmentPart, String regions) {
 ```
 
 
+
+```bash
+
+// setup
+
+def deployToEnvironment(String environmentPart, String regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    try {
+        setGitConfig() // Ensure git configuration is set before operations
+        cloneRepository(repoDirectory)
+
+        def regionList = regions.tokenize(',')
+
+        dir(repoDirectory) {
+            regionList.each { regionPart ->
+                def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
+                def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
+
+                // Check if the Helm values file exists for web and queue for each region before updating
+                if (fileExists("${env.VALUES_PATH_WEB}/${fileNameWeb}")) {
+                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
+                } else {
+                    echo "File ${env.VALUES_PATH_WEB}/${fileNameWeb} does not exist"
+                }
+                
+                if (fileExists("${env.VALUES_PATH_QUEUE}/${fileNameQueue}")) {
+                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
+                } else {
+                    echo "File ${env.VALUES_PATH_QUEUE}/${fileNameQueue} does not exist"
+                }
+            }
+
+            // Attempt to commit and push changes even if there were errors in previous steps
+            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+        }
+    } catch (Exception e) {
+        echo "An error occurred during deployment: ${e.message}"
+        // Errors are logged but do not halt execution, allowing the pipeline to continue
+    }
+}
+
+
+```
+
+
