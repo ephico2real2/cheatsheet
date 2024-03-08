@@ -9,7 +9,7 @@ stages:
 
 testim:
   stage: e2e
-  image: testim/cli:latest
+  image: testim/cli:latest OR testim/docker-cli
   variables:
     TESTIM_TOKEN: <TESTIM_TOKEN>
     TESTIM_PROJECT: <TESTIM_PROJECT>
