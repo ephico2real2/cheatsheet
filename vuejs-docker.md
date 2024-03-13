@@ -248,3 +248,53 @@ To support the seamless deployment of our Vue.js application within our Kubernet
 - Comprehensive Kubernetes cluster setup on MacBook.
 
 This story focuses on enabling efficient deployment and testing processes for the Vue.js application, providing the necessary tools and guidance for developers to contribute effectively within a Kubernetes environment.
+
+To create an entry script for Dockerizing Nginx that includes a check for the `nginx.conf` file's validation before starting Nginx, you can follow these steps. This approach ensures that your container only runs if the Nginx configuration is valid, helping to avoid startup issues due to configuration errors.
+
+1. **Create a Shell Script**: First, you'll create a shell script that will run the validation check and then start Nginx. Let's call this script `start-nginx.sh`.
+
+2. **Edit Dockerfile**: You will need to modify your Dockerfile to copy this script into the image and set it as the entry point.
+
+Here's how you could write the `start-nginx.sh` script:
+
+```bash
+#!/bin/sh
+
+# Validate the Nginx configuration.
+echo "Checking Nginx configuration..."
+nginx -t
+
+# Check if nginx -t command was successful
+if [ $? -eq 0 ]; then
+    echo "Nginx configuration is valid."
+    echo "Starting Nginx..."
+    exec nginx -g 'daemon off;'
+else
+    echo "Nginx configuration is invalid."
+    exit 1
+fi
+```
+
+And then, in your Dockerfile, you would include steps like the following:
+
+```Dockerfile
+# Use the official Nginx image as a parent image
+FROM nginx
+
+# Copy your custom configuration file over the default one
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy the entry script into the image
+COPY start-nginx.sh /start-nginx.sh
+
+# Make the script executable
+RUN chmod +x /start-nginx.sh
+
+# Set the entry script as the entry point
+ENTRYPOINT ["/start-nginx.sh"]
+```
+
+Ensure that you have both the `nginx.conf` and `start-nginx.sh` files in the same directory as your Dockerfile when you build your Docker image. Also, make sure to give `start-nginx.sh` execute permissions before building the image by running `chmod +x start-nginx.sh`.
+
+By following this approach, the container will attempt to start Nginx only if the `nginx -t` command confirms that the configuration file syntax is correct. If the configuration is invalid, the container will exit, making it easier to catch and fix configuration issues.
+
