@@ -108,3 +108,58 @@ In order to streamline the local development and testing process for our Vue.js 
 
 This story aims to empower the development team by providing a robust, easy-to-use local testing environment that mimics production as closely as possible, thus enhancing productivity and reducing the time to identify and fix issues.
 
+
+Certainly, here's a template for a Jira story focused on integrating the Vue.js application into an existing Jenkins CI/CD pipeline, utilizing a Helm chart for deployment:
+
+---
+
+**Title:** Integrate Vue.js Application into Jenkins CI/CD Pipeline Using Helm
+
+**Epic Link:** CI/CD Pipeline Enhancement
+
+**Type:** Story
+
+**Assignee:** [DevOps Engineer's Name]
+
+**Reporter:** [Your Name or the Project Manager's Name]
+
+**Priority:** High
+
+**Labels:** CI/CD, Jenkins, Helm, Vue.js
+
+**Sprint:** [Appropriate Sprint Number]
+
+### Description
+
+We aim to streamline the deployment process for our Vue.js application by integrating it into our existing Jenkins CI/CD pipeline. This will involve adjusting our current Helm chart to accommodate the deployment needs of the Vue.js application, ensuring a smooth, automated deployment process to our Kubernetes cluster.
+
+### Acceptance Criteria
+
+1. **Helm Chart Adaptation:** Modify our existing Helm chart to support the Vue.js application, ensuring it can be dynamically configured for different environments (development, staging, production) through Helm values.
+
+2. **Jenkins Pipeline Configuration:** Update our Jenkins pipeline to include steps for building the Vue.js Docker image, pushing it to our container registry, and deploying it using the adapted Helm chart. This should include any necessary stages for linting, testing, and conditional deployments based on branch or tag.
+
+3. **Documentation Update:** Revise the CI/CD pipeline documentation to include the addition of the Vue.js application, detailing any new steps, configurations, or prerequisites required for successful builds and deployments.
+
+4. **Testing and Validation:** Perform end-to-end testing of the CI/CD pipeline to ensure that changes to the Vue.js application can be automatically built, tested, and deployed to the appropriate environment without manual intervention.
+
+5. **Rollback Strategy:** Implement a clear rollback strategy within the pipeline for the Vue.js application deployments, allowing for quick recovery in case of deployment failures or issues.
+
+### Notes
+
+- Ensure the pipeline supports notification mechanisms for build and deployment statuses.
+- Consider security best practices throughout the pipeline, especially when handling secrets and access permissions.
+
+### Dependencies
+
+- Access to the Jenkins server and necessary permissions to update the pipeline.
+- Access to the source code repository of the Vue.js application.
+- Existing Helm chart that can be adapted for the Vue.js application deployment.
+
+### Out of Scope
+
+- Major modifications to the underlying infrastructure or Kubernetes cluster.
+- Overhauling the entire CI/CD pipeline for services unrelated to the Vue.js application.
+
+This story seeks to enhance our deployment capabilities and efficiency by bringing the Vue.js application into our automated CI/CD workflow, ensuring consistency, reliability, and speed in our deployment processes.
+
