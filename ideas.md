@@ -57,3 +57,42 @@ The implementation must be peer-reviewed and subject to rigorous testing, includ
 ---
 
 This story template not only focuses on the technical refactoring tasks but also emphasizes learning from the PoC, ensuring that the secure practices demonstrated are correctly integrated and adopted in the broader application portfolio.
+
+
+
+Understood, let's refine the JIRA story to match your clarified requirements. This version will emphasize the creation of a singular Flow and Output Custom Resource Definition (CRD) per namespace, intended to select and forward logs from pods that match a specific label. It will also reflect that the Helm chart is being created to facilitate easier templating across different clusters.
+
+---
+
+### Title:
+Create Helm Chart for Namespace-wide Logging Flow and Output Configuration via Logging Operator
+
+### Description:
+The objective is to develop a new Helm chart that simplifies the deployment of namespace-wide logging configurations using the Logging Operator. This Helm chart will facilitate the creation of a single Flow and Output CRD per namespace. These CRDs will be configured to select and forward logs from all application pods within the namespace that match a specified label, streamlining the logging process across multiple services. The creation of this Helm chart aims to enable easier, cluster-specific templating and deployment of logging infrastructure, ensuring consistent log management practices across our Kubernetes environments.
+
+### Acceptance Criteria:
+1. **Singular Flow and Output CRDs**: Ensure the Helm chart dynamically generates a single Flow and Output CRD per namespace that can forward logs from pods matching a specific label.
+2. **Label-based Pod Selection**: The Flow CRD must be configured to select pods based on a predefined label, which is added to all application deployments within the namespace.
+3. **CloudWatch Integration**: The Output CRD should be configured to forward the selected logs to AWS CloudWatch, leveraging the Logging Operator's capabilities.
+4. **Helm Chart Documentation**: Include comprehensive documentation within the Helm chart, detailing how to deploy it across different clusters and explaining the label-based selection mechanism.
+5. **Testing and Validation**: Demonstrate the Helm chart's functionality by deploying it in a test environment, verifying that it correctly identifies and forwards logs from the targeted pods to CloudWatch.
+
+### Task Breakdown:
+- [ ] Design the `values.yaml` structure to support namespace-wide Flow and Output configuration.
+- [ ] Implement Helm templates for creating the Flow and Output CRDs with the necessary selectors and CloudWatch forwarding.
+- [ ] Add a predefined label to all application deployments within the Helm chart to enable unified log selection.
+- [ ] Write detailed documentation for the Helm chart, covering deployment instructions and the logic behind label-based pod selection.
+- [ ] Conduct comprehensive testing in a controlled environment to ensure the logging configuration works as intended across different services.
+
+### Priority:
+Medium
+
+### Labels:
+- Kubernetes
+- Helm
+- Logging
+- CloudWatch
+- LoggingOperator
+- ConfigurationManagement
+
+---
