@@ -46,21 +46,13 @@ Incorporate the secure secret management approach demonstrated in the Flask PoC 
 
 **Resources:**
 
-- Link to Flask PoC Repository: [Repository URL]
-- Kyverno Policies and Violations Report: [Link to report]
-- Flask and Kubernetes Documentation: [Links to relevant documentation]
+- Link to Flask PoC Repository: [https://github.com/ephico2real2/flask-dynamic-secrets-watchdog]
 
 **Review and Testing:**
 
 The implementation must be peer-reviewed and subject to rigorous testing, including automated tests to verify functionality and manual tests to ensure that the secret management mechanism aligns with our security requirements. The testing phase should also validate the seamless deployment of applications with the new secret management setup in Kubernetes.
 
 ---
-
-This story template not only focuses on the technical refactoring tasks but also emphasizes learning from the PoC, ensuring that the secure practices demonstrated are correctly integrated and adopted in the broader application portfolio.
-
-
-
-Understood, let's refine the JIRA story to match your clarified requirements. This version will emphasize the creation of a singular Flow and Output Custom Resource Definition (CRD) per namespace, intended to select and forward logs from pods that match a specific label. It will also reflect that the Helm chart is being created to facilitate easier templating across different clusters.
 
 ---
 
