@@ -1,338 +1,53 @@
-```
-        stage('Wait for Agent') {
-            steps {
-                script {
-                    // Wait for the Kubernetes pod to be ready
-                    sleep(time: 30, unit: 'SECONDS')
-                }
-            }
-        }
-```
-
-
-
-
-```
-        
-        stage('Build Web Image') {
-            when {
-                anyOf { branch 'dev'; branch 'prod' }
-            }
-            steps {
-                script {
-                    kanikoBuildImage('dev/web/Dockerfile', 'web-portal', "${env.IMAGE_TAG}", "build_type=${env.BUILDTYPE}")
-                }
-            }
-        }
-
-        stage('Build Queue Image') {
-            when {
-                anyOf { branch 'dev'; branch 'prod' }
-            }
-            steps {
-                script {
-                    kanikoBuildImage('dev/queue/Dockerfile', 'queue-portal', "${env.IMAGE_TAG}", "build_type=${env.BUILDTYPE}")
-                }
-            }
-        }
-
-
-        kanikoBuildImage('dev/web/Dockerfile', 'web-portal', "${env.GIT_COMMIT.take(7)}", "build_type=${env.BUILDTYPE}")
-
-        kanikoBuildImage('dev/web/Dockerfile', 'web-portal', "${env.GIT_COMMIT.take(7)}", "build_type=${env.BUILDTYPE}")
-
-```
-
-######
-
-```
-def cloneRepository(String repoDirectory) {
-    try {
-        echo "Cloning repository from ${env.HELM_MANIFEST_REPO} into ${repoDirectory}"
-        
-        sh """
-        set -x
-        git clone --single-branch --branch ${env.HELM_REPO_BRANCH} ${env.HELM_MANIFEST_REPO} ${repoDirectory}
-        """
-        
-        echo "Repository cloned successfully into ${repoDirectory}"
-    } catch (Exception e) {
-        echo "Error while cloning repository: ${e.getMessage()}"
-        throw e // Rethrow the exception to handle it at a higher level or fail the build
-    }
-}
-
-def updateHelmValues(String fileName, String valuesPath) {
-    try {
-        echo "Updating Helm values file: ${valuesPath}/${fileName} with image tag ${env.IMAGE_TAG}"
-        
-        sh """
-        set -x
-        yq eval '.image.tag = \"${env.IMAGE_TAG}\"' -i ${valuesPath}/${fileName}
-        """
-        
-        echo "Helm values file updated successfully."
-    } catch (Exception e) {
-        echo "Error while updating Helm values file: ${e.getMessage()}"
-        throw e // Rethrow the exception to handle it at a higher level or fail the build
-    }
-}
-
-def gitCommitAndPush(String repoDirectory) {
-    dir(repoDirectory) {
-        try {
-            echo "Committing and pushing changes..."
-            sh """
-            set -x
-            git add .
-            git commit -m 'Promote ${env.HELM_REPO_BRANCH} environment with new image tag: ${env.IMAGE_TAG}'
-            git push origin ${env.HELM_REPO_BRANCH}
-            """
-            echo "Changes have been pushed successfully."
-        } catch (Exception e) {
-            echo "Error while committing and pushing: $e"
-            throw e // Re-throw the exception to ensure the build fails appropriately
-        }
-    }
-}
-
-```
-
-```
-// ### for loop
-
-def deployToEnvironment(String environmentPart, String[] regions) {
-    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
-    cloneRepository(repoDirectory)
-
-    dir(repoDirectory) {
-        regions.each { regionPart ->
-            def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
-            def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
-
-            // Update Helm values for web and queue for each region
-            updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
-            updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
-        }
-
-        // After all updates are done for each region, commit and push
-        gitCommitAndPush(repoDirectory)
-    }
-}
-
-```
-
-```
-
-def updateHelmValues(String fileName, String valuesPath) {
-    sh "yq eval '.image.tag = \"${env.IMAGE_TAG}\"' -i ${valuesPath}/${fileName}"
-}
-
-def gitCommitAndPush(String repoDirectory) {
-    try {
-        echo "Committing and pushing changes..."
-
-        sh """
-        set -x
-        git add .
-        git commit -m 'Promote environment with new image tag: ${env.IMAGE_TAG}'
-        git push origin ${env.HELM_REPO_BRANCH}
-        """
-
-        echo "Changes have been pushed successfully."
-    } catch (Exception e) {
-        echo "Error while committing and pushing: ${e.getMessage()}"
-        throw e // Rethrow the exception to handle it at a higher level or fail the build
-    }
-}
-
-// Then you can call deployToEnvironment like this:
-deployToEnvironment('dev', ['euw2', 'use1'])
-
-
-```
-
-```bash
-
-// Testing
-
-def deployToEnvironment(String environmentPart, String regions) {
-    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
-    cloneRepository(repoDirectory)
-    
-    def regionList = regions.tokenize(',')
-    
-    dir(repoDirectory) {
-        regionList.each { regionPart ->
-            def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
-            def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
-
-            // Update Helm values for web and queue for each region
-            updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
-            updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
-        }
-
-        // After all updates are done for each region, commit and push
-        gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
-    }
-}
-
-
-//
-
-steps {
-    script {
-        def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
-        ['sbox', 'dev'].each { envName ->
-            sshagent(['django-github-k8s']) {
-                container('aws') {
-                    regionsList.each { region ->
-                        echo "Deploying ${envName} to region ${region}"
-                        deployToEnvironment(envName, [region]) // Pass region in a list if required
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-```
-
-```
-def deployToEnvironment(String environmentPart, String regions) {
-    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
-    try {
-        setGitConfig() // Ensuring git configuration is set
-        cloneRepository(repoDirectory)
-
-        def regionList = regions.tokenize(',')
-
-        dir(repoDirectory) {
-            regionList.each { regionPart ->
-                try {
-                    def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
-                    def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
-
-                    // Attempt to update Helm values for web and queue for each region
-                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
-                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
-                } catch (Exception e) {
-                    echo "An error occurred while processing region ${regionPart}: ${e.message}"
-                    // No throw statement here; log and continue with the next region
-                }
-            }
-
-            // Attempt to commit and push changes even if there were errors in previous steps
-            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
-        }
-    } catch (Exception e) {
-        echo "An error occurred during deployment: ${e.message}"
-        // No re-throwing the exception here to allow the pipeline to continue
-    }
-}
-
-```
-
-
-
-```bash
-
-// setup
-
-def deployToEnvironment(String environmentPart, String regions) {
-    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
-    try {
-        setGitConfig() // Ensure git configuration is set before operations
-        cloneRepository(repoDirectory)
-
-        def regionList = regions.tokenize(',')
-
-        dir(repoDirectory) {
-            regionList.each { regionPart ->
-                def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
-                def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
-
-                // Check if the Helm values file exists for web and queue for each region before updating
-                if (fileExists("${env.VALUES_PATH_WEB}/${fileNameWeb}")) {
-                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
-                } else {
-                    echo "File ${env.VALUES_PATH_WEB}/${fileNameWeb} does not exist"
-                }
-                
-                if (fileExists("${env.VALUES_PATH_QUEUE}/${fileNameQueue}")) {
-                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
-                } else {
-                    echo "File ${env.VALUES_PATH_QUEUE}/${fileNameQueue} does not exist"
-                }
-            }
-
-            // Attempt to commit and push changes even if there were errors in previous steps
-            gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
-        }
-    } catch (Exception e) {
-        echo "An error occurred during deployment: ${e.message}"
-        // Errors are logged but do not halt execution, allowing the pipeline to continue
-    }
-}
-
-
-```
-
-
-```
-steps {
-    script {
-        sshagent(['django-github-k8s']) {
-            container('aws') {
-                def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
-                regionsList.each { region ->
-                    echo "Deploying to stage in region ${region}"
-                    deployToEnvironment('stage', region)
-                }
-            }
-        }
-    }
-}
-
-
-```
-
-```bash
-def deployToEnvironment(String environmentPart, String regions) {
-    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
-    try {
-        setupGitConfig()
-        cloneRepository(repoDirectory)
-
-        def regionList = regions.tokenize(',')
-
-        dir(repoDirectory) {
-            regionList.each { regionPart ->
-                def fileNameWeb = "values-${environmentPart}-${regionPart}.yaml"
-                def fileNameQueue = "values-${environmentPart}-${regionPart}.yaml"
-
-                if (!fileExists("${env.VALUES_PATH_WEB}/${fileNameWeb}")) {
-                    echo "WARNING: File ${env.VALUES_PATH_WEB}/${fileNameWeb} does not exist. Skipping update for this file."
-                } else {
-                    updateHelmValues(fileNameWeb, env.VALUES_PATH_WEB)
-                }
-
-                if (!fileExists("${env.VALUES_PATH_QUEUE}/${fileNameQueue}")) {
-                    echo "WARNING: File ${env.VALUES_PATH_QUEUE}/${fileNameQueue} does not exist. Skipping update for this file."
-                } else {
-                    updateHelmValues(fileNameQueue, env.VALUES_PATH_QUEUE)
-                }
-            }
-
-            //gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
-             //gitCommitAndPush(repoDirectory)
-        }
-    } catch (Exception e) {
-        echo "An error occurred during deployment: ${e.message}. Continuing with the pipeline."
-    }
-}
-
-
-```
-
+To effectively integrate Jenkins CI, SonarQube, and Helm chart deployment for an application called "DemoA," you can create a detailed JIRA story that outlines all the necessary tasks and sub-tasks required for successful integration. Below is a suggested breakdown of the story and its components:
+
+### JIRA Story: Integrate Jenkins CI, SonarQube, and Helm Chart Deployment for DemoA
+
+**Summary:** Implement continuous integration and deployment for DemoA using Jenkins, with code quality checks via SonarQube and application deployment using Helm charts.
+
+**Description:**
+As part of our ongoing efforts to enhance the CI/CD pipeline, we need to integrate Jenkins, SonarQube, and Helm for the DemoA application. This will enable automated builds, tests, code quality assessments, and deployments, ensuring faster turnaround times and higher code quality.
+
+**Acceptance Criteria:**
+1. **Jenkins Pipeline Configuration:**
+   - Jenkins pipeline is configured to trigger on commits to specific branches (e.g., `main`, `develop`).
+   - Pipeline supports building branches and PRs, with stages for build, test, and deploy.
+2. **SonarQube Integration:**
+   - Code quality analysis is set up to run with every build.
+   - Any merge/push to `main` branch should fail if it does not meet the quality gates set in SonarQube.
+3. **Helm Chart Deployment:**
+   - Helm charts are configured to deploy the application to a Kubernetes environment.
+   - Staging and production environments are set up with conditional deployments via Helm.
+
+### Tasks:
+1. **[DEVOPS-1]** Create and Customize Jenkinsfile for DemoA
+   - Tailor the standard Jenkinsfile to include build, test, and deployment stages specific to DemoA.
+   - Ensure integration points with SonarQube and Helm are correctly configured.
+
+2. **[DEVOPS-2]** Set Up Multi-Branch Pipeline in Jenkins
+   - Configure Jenkins to automatically detect branches and PRs for the DemoA repository.
+   - Set up webhooks for automatic triggering of builds upon code commits.
+
+3. **[DEVOPS-3]** Configure SonarQube for DemoA
+   - Set up a SonarQube project for DemoA.
+   - Define quality gates for code coverage, technical debt, bugs, and vulnerabilities.
+
+4. **[DEVOPS-4]** Create and Configure Helm Charts for DemoA
+   - Develop Helm charts for deploying DemoA to Kubernetes.
+   - Configure separate values files for staging and production environments.
+
+5. **[DEVOPS-5]** Implement Deployment Scripts
+   - Write scripts to manage conditional deployments to staging and production using Helm.
+   - Include rollback strategies and manual approval steps for production deployments.
+
+6. **[DEVOPS-6]** Documentation and Training
+   - Document the CI/CD process, including Jenkins pipeline stages, SonarQube integration, and Helm deployment instructions.
+   - Conduct a training session for the development team on using the new pipeline.
+
+7. **[DEVOPS-7]** Testing and Validation
+   - Perform end-to-end tests to ensure the pipeline works as expected.
+   - Validate that SonarQube quality gates are enforced and Helm deployments are successful in different environments.
+
+### Sub-Tasks for Each Main Task:
+- **For each main task listed above, create appropriate sub-tasks in JIRA that detail the individual steps required. For example, under the Jenkins setup task, include sub-tasks for writing the Jenkinsfile, testing the Jenkins pipeline, and integrating with existing development workflows.**
+
+This structured approach ensures all aspects of the CI/CD pipeline integration are covered, providing a clear roadmap for execution and ensuring all team members understand their responsibilities.
