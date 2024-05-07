@@ -4,7 +4,7 @@ My apologies for that oversight. Let's ensure those `ARG` and `ENV` statements a
 
 ```Dockerfile
 # Production stage
-FROM dexcom.jfrog.io/dexcom-docker-secure-local/chainguard/dexcom-chainguard-jre:openjdk-17
+FROM funny-bear.jfrog.io/funny-bear-docker-secure-local/chainguard/funny-bear-chainguard-jre:openjdk-17
 COPY --from=builder /accounts-api/build/libs/accounts-api.jar /app/accounts-api.jar
 WORKDIR /app
 
