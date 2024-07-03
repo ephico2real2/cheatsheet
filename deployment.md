@@ -1,6 +1,6 @@
-Deployment YAML and the complete setup:
+The Deployment YAML to include liveness and readiness probes using TCP socket checks, as well as setting resource limits and requests for CPU and memory.
 
-### Deployment YAML (`deployment.yaml`)
+### Updated Deployment YAML (`deployment.yaml`)
 
 ```yaml
 apiVersion: apps/v1
@@ -33,6 +33,23 @@ spec:
           mountPath: /root/.ssh
           readOnly: true
           subPath: id_rsa
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
       volumes:
       - name: ssh-key-volume
         secret:
@@ -43,6 +60,8 @@ spec:
 ```
 
 ### Service YAML (`service.yaml`)
+
+No changes needed for the Service YAML.
 
 ```yaml
 apiVersion: v1
@@ -62,6 +81,8 @@ spec:
 
 ### Secret YAML (`ssh-key-secret.yaml`)
 
+No changes needed for the Secret YAML.
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -74,6 +95,8 @@ data:
 ```
 
 ### Makefile
+
+No changes needed for the Makefile.
 
 ```makefile
 .PHONY: all deploy redeploy clean
@@ -115,6 +138,8 @@ clean-secret:
 ```
 
 ### README.md
+
+No changes needed for the README.
 
 ```markdown
 # Service Configurator Deployment
@@ -198,8 +223,20 @@ make clean-secret
 
 - **SSH Key Volume:** Mounted at `/root/.ssh` in the container with a subPath `id_rsa`.
 
+## Resource Requests and Limits
+
+- **Memory Requests:** 128Mi
+- **CPU Requests:** 250m
+- **Memory Limits:** 256Mi
+- **CPU Limits:** 500m
+
+## Health Checks
+
+- **Liveness Probe:** TCP socket on port 5000, initial delay 30s, period 10s
+- **Readiness Probe:** TCP socket on port 5000, initial delay 5s, period 10s
+
 ```
 
 ### Summary
 
-This setup includes a `Makefile` to manage the deployment and redeployment of your Kubernetes application, along with the necessary Kubernetes resources for your application. The `Makefile` handles creating the SSH key secret, deploying the application, and cleaning up resources. The `imagePullPolicy` is set to `IfNotPresent` to ensure Kubernetes uses the local Docker image if available.
+This updated setup includes liveness and readiness probes using TCP socket checks and sets resource requests and limits for CPU and memory. The `Makefile` and other YAML files remain largely the same, with added instructions in the README to deploy and redeploy the application, ensuring the proper configuration of the Kubernetes resources.
