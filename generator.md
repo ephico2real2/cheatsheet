@@ -215,4 +215,81 @@ Opting for the 10-year warranty for the 22 kW generator at an additional cost of
 
 ---
 
-This guide provides a comprehensive analysis to help you make an informed decision on choosing the right generator based on daily usage, yearly costs, and the value of additional capacity and extended warranty options.
+
+Based on the provided fuel consumption information for both propane (liquefied petroleum vapor fuel) and natural gas (NG) for generators ranging from 17 kW to 26 kW, we can provide a detailed analysis of daily and yearly costs for running these generators.
+
+### Fuel Consumption Details
+
+#### Propane (Liquefied Petroleum Vapor Fuel)
+| Power (kW) | Full Load (ft³/hr) | Full Load (gal/hr) | 1/2 Load (ft³/hr) | 1/2 Load (gal/hr) |
+|------------|--------------------|--------------------|-------------------|-------------------|
+| 17 kW      | 118                | 3.3                | 74                | 2.10              |
+| 18 kW      | 124                | 3.5                | 77                | 2.2               |
+| 20 kW      | 135                | 3.7                | 83                | 2.4               |
+| 22 kW      | 147                | 4.1                | 87                | 2.6               |
+| 26 kW      | 171                | 4.7                | 94                | 2.9               |
+
+#### Natural Gas (NG)
+| Power (kW) | Full Load (ft³/hr) | 1/2 Load (ft³/hr) |
+|------------|--------------------|-------------------|
+| 17 kW      | 248                | 170               |
+| 18 kW      | 252                | 176               |
+| 20 kW      | 260                | 187               |
+| 22 kW      | 281                | 194               |
+| 26 kW      | 323                | 206               |
+
+### Cost Analysis for Propane and Natural Gas
+
+#### Propane Cost Analysis
+**Propane Cost:** $3.75 per gallon
+
+**Daily and Yearly Costs for Propane:**
+| Power (kW) | Full Load (gal/hr) | Full Load (USD/day) | 1/2 Load (gal/hr) | 1/2 Load (USD/day) |
+|------------|--------------------|---------------------|-------------------|---------------------|
+| 17 kW      | 3.3                | 3.3 * 24 * 3.75 = 297.00 | 2.10              | 2.10 * 24 * 3.75 = 189.00 |
+| 18 kW      | 3.5                | 3.5 * 24 * 3.75 = 315.00 | 2.2               | 2.2 * 24 * 3.75 = 198.00 |
+| 20 kW      | 3.7                | 3.7 * 24 * 3.75 = 333.00 | 2.4               | 2.4 * 24 * 3.75 = 216.00 |
+| 22 kW      | 4.1                | 4.1 * 24 * 3.75 = 369.00 | 2.6               | 2.6 * 24 * 3.75 = 234.00 |
+| 26 kW      | 4.7                | 4.7 * 24 * 3.75 = 423.00 | 2.9               | 2.9 * 24 * 3.75 = 261.00 |
+
+**Yearly Cost (14 days):**
+| Power (kW) | Full Load (USD/14 days) | 1/2 Load (USD/14 days) |
+|------------|--------------------------|------------------------|
+| 17 kW      | 297.00 * 14 = 4,158.00   | 189.00 * 14 = 2,646.00 |
+| 18 kW      | 315.00 * 14 = 4,410.00   | 198.00 * 14 = 2,772.00 |
+| 20 kW      | 333.00 * 14 = 4,662.00   | 216.00 * 14 = 3,024.00 |
+| 22 kW      | 369.00 * 14 = 5,166.00   | 234.00 * 14 = 3,276.00 |
+| 26 kW      | 423.00 * 14 = 5,922.00   | 261.00 * 14 = 3,654.00 |
+
+#### Natural Gas Cost Analysis
+**Natural Gas Cost:** $1.6026 per CCF (1 CCF = 100 ft³)
+
+**Daily and Yearly Costs for Natural Gas:**
+| Power (kW) | Full Load (ft³/hr) | Full Load (USD/day) | 1/2 Load (ft³/hr) | 1/2 Load (USD/day) |
+|------------|--------------------|---------------------|-------------------|---------------------|
+| 17 kW      | 248                | (248 * 24) / 100 * 1.6026 = 95.40  | 170                | (170 * 24) / 100 * 1.6026 = 65.44  |
+| 18 kW      | 252                | (252 * 24) / 100 * 1.6026 = 97.01  | 176                | (176 * 24) / 100 * 1.6026 = 67.55  |
+| 20 kW      | 260                | (260 * 24) / 100 * 1.6026 = 100.06 | 187                | (187 * 24) / 100 * 1.6026 = 71.90  |
+| 22 kW      | 281                | (281 * 24) / 100 * 1.6026 = 108.24 | 194                | (194 * 24) / 100 * 1.6026 = 74.43  |
+| 26 kW      | 323                | (323 * 24) / 100 * 1.6026 = 124.32 | 206                | (206 * 24) / 100 * 1.6026 = 79.07  |
+
+**Yearly Cost (14 days):**
+| Power (kW) | Full Load (USD/14 days) | 1/2 Load (USD/14 days) |
+|------------|--------------------------|------------------------|
+| 17 kW      | 95.40 * 14 = 1,335.60    | 65.44 * 14 = 916.16    |
+| 18 kW      | 97.01 * 14 = 1,358.14    | 67.55 * 14 = 945.70    |
+| 20 kW      | 100.06 * 14 = 1,400.84   | 71.90 * 14 = 1,006.60  |
+| 22 kW      | 108.24 * 14 = 1,515.36   | 74.43 * 14 = 1,042.02  |
+| 26 kW      | 124.32 * 14 = 1,740.48   | 79.07 * 14 = 1,106.98  |
+
+### Summary
+
+| Power (kW) | Propane Full Load (USD/14 days) | Propane 1/2 Load (USD/14 days) | Natural Gas Full Load (USD/14 days) | Natural Gas 1/2 Load (USD/14 days) |
+|------------|---------------------------------|--------------------------------|-------------------------------------|------------------------------------|
+| 17 kW      | 4,158.00                        | 2,646.00                       | 1,335.60                            | 916.16                             |
+| 18 kW      | 4,410.00                        | 2,772.00                       | 1,358.14                            | 945.70                             |
+| 20 kW      | 4,662.00                        | 3,024.00                       | 1,400.84                            | 1,006.60                           |
+| 22 kW      | 5,166.00                        | 3,276.00                       | 1,515.36                            | 1,042.02                           |
+| 26 kW      | 5,922.00                        | 3,654.00                       | 1,740.48                            | 1,106.98                           |
+
+Based on this analysis, natural gas is significantly cheaper than propane for running the generators. Therefore, if you have the option, it would be more cost-effective to use a natural gas-powered generator.
