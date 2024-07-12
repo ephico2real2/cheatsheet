@@ -181,3 +181,34 @@ Considering the typical power usage for your household and the price differences
 
 ### Final Recommendation:
 **Generator 2 (22,000 Watts)** is the most suitable choice for your household. It offers the right balance between capacity and cost, ensuring you have reliable power during high-demand periods like hurricanes. If budget permits, opting for the 10-year warranty version provides added security and peace of mind for an extended period.
+
+
+
+# Phase 3
+### Price Analysis for the Additional 4 kW Capacity
+
+#### Generators:
+- **Generator 1 (18 kW)**
+- **Generator 2 (22 kW) with a 7-Year Warranty**
+
+### Price Difference Calculation
+
+1. **Generator 1 (18 kW):** $6,272.00
+2. **Generator 2 (22 kW):** $6,527.00
+
+### Price Difference:
+\[ \text{Price Difference} = \$6,527.00 - \$6,272.00 = \$255.00 \]
+
+### Cost per Additional Watt:
+\[ \text{Additional Wattage} = 22,000 \, \text{Watts} - 18,000 \, \text{Watts} = 4,000 \, \text{Watts} \]
+\[ \text{Cost per Additional Watt} = \frac{\$255.00}{4,000 \, \text{Watts}} = \$0.06375 \, \text{per Watt} \]
+
+### Summary:
+- **Cost Difference:** $255.00
+- **Additional Capacity:** 4,000 Watts
+- **Cost per Additional Watt:** $0.06375 per Watt
+
+### Conclusion:
+The cost of upgrading from an 18 kW generator to a 22 kW generator for an additional $255.00 is quite reasonable. The cost per additional watt is $0.06375, which is a low incremental cost for the increased capacity. This additional capacity can be crucial for ensuring your household can handle peak loads, especially during emergencies.
+
+Based on this analysis, the price of going from 18 kW to 22 kW for the extra 4,000 watts is worth it, providing you with more flexibility and reliability for only a modest increase in cost.
