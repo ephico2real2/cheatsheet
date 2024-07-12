@@ -98,3 +98,86 @@ I have calculated and displayed the total costs for running the 18 kW, 22 kW, an
 - **100% Load:** $1,740.48
 
 These calculations provide a detailed breakdown of the costs associated with using natural gas from SI Energy to power the generators for 14 days. The total costs include both the generator purchase price and the operational costs for different load capacities.
+
+
+
+# Phase 2
+
+### Recommendation for 22 kW Generator Based on Home Usage and Price Differences
+
+#### Typical Home Usage:
+For a household of 4500 square feet with two-zone AC units (one 3.5 tonnes and one 2.5 tonnes), the power requirements are substantial. Here’s a quick recap of the power usage:
+
+- **3.5-ton AC unit:** Approximately 12.31 kW
+- **2.5-ton AC unit:** Approximately 8.79 kW
+- **Total AC power requirement:** 21.1 kW
+
+Additional household loads (lighting, refrigerator, other electronics) are estimated at around 5 kW.
+
+- **Total household power requirement:** 21.1 kW (AC units) + 5 kW (additional household load) = 26.1 kW
+
+However, considering that not all devices run at full load simultaneously, a 22 kW generator can provide a balanced solution for power needs, especially during high-demand periods such as hurricane seasons.
+
+### Cost Analysis for 22 kW vs. 18 kW Generators
+
+#### Generator 2 (22,000 Watts) with a 7-Year Warranty:
+
+1. **50% Load:**
+   - **Total Cost:** $7,591.21
+
+2. **75% Load:**
+   - **Total Cost:** $7,826.41
+
+3. **100% Load:**
+   - **Total Cost:** $8,061.61
+
+#### Generator 2 (22,000 Watts) with a 10-Year Warranty:
+
+1. **50% Load:**
+   - **Total Cost:** $8,201.21
+
+2. **75% Load:**
+   - **Total Cost:** $8,436.41
+
+3. **100% Load:**
+   - **Total Cost:** $8,671.61
+
+#### Generator 1 (18,000 Watts):
+
+1. **50% Load:**
+   - **Total Cost:** $7,238.77
+
+2. **75% Load:**
+   - **Total Cost:** $7,443.73
+
+3. **100% Load:**
+   - **Total Cost:** $7,648.69
+
+### Price Differences between 18 kW and 22 kW Generators
+
+#### Generator 2 (22 kW) vs. Generator 1 (18 kW):
+
+1. **50% Load:**
+   - **Price Difference (7-Year Warranty):** $7,591.21 - $7,238.77 = $352.44
+   - **Price Difference (10-Year Warranty):** $8,201.21 - $7,238.77 = $962.44
+
+2. **75% Load:**
+   - **Price Difference (7-Year Warranty):** $7,826.41 - $7,443.73 = $382.68
+   - **Price Difference (10-Year Warranty):** $8,436.41 - $7,443.73 = $992.68
+
+3. **100% Load:**
+   - **Price Difference (7-Year Warranty):** $8,061.61 - $7,648.69 = $412.92
+   - **Price Difference (10-Year Warranty):** $8,671.61 - $7,648.69 = $1,022.92
+
+### Recommendation
+
+Considering the typical power usage for your household and the price differences, here are the key points for choosing the 22 kW generator:
+
+1. **Sufficient Capacity:** The 22 kW generator provides adequate power to meet the peak demands of your household, including running both AC units and other essential loads simultaneously.
+
+2. **Cost Difference Justification:** The price difference between the 18 kW and 22 kW generators is relatively small (ranging from $352.44 to $412.92 for the 7-year warranty version). This difference is justified by the additional capacity and peace of mind knowing that your generator can handle higher loads without strain.
+
+3. **Extended Warranty Consideration:** For an additional $610, you can get a 10-year warranty for the 22 kW generator, which provides extended coverage and could potentially save significant repair costs in the long run. If the extended warranty cost fits within your budget, it is a valuable investment for long-term reliability.
+
+### Final Recommendation:
+**Generator 2 (22,000 Watts)** is the most suitable choice for your household. It offers the right balance between capacity and cost, ensuring you have reliable power during high-demand periods like hurricanes. If budget permits, opting for the 10-year warranty version provides added security and peace of mind for an extended period.
