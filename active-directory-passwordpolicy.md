@@ -177,106 +177,10 @@ By following this guide, you should be able to successfully create and apply a F
 
 ## Verifications:
 
-```
-notepad Verify-FGPP.ps1
-
-```
-
-## Add the following
+To check the password policy applied to a user in Active Directory using built-in PowerShell cmdlets, you can use the following command:
 
 ```powershell
-# Import the Active Directory module
-Import-Module ActiveDirectory
-
-# Function to test password against policy
-function Test-Password {
-    param (
-        [string]$UserName,
-        [string]$Password
-    )
-    try {
-        Set-ADAccountPassword -Identity $UserName -NewPassword (ConvertTo-SecureString -AsPlainText $Password -Force) -Reset -ErrorAction Stop
-        return $true
-    }
-    catch {
-        return $false
-    }
-}
-
-# Prompt for user input
-$userName = Read-Host "Enter the username to check"
-$policyName = Read-Host "Enter the name of the Fine-Grained Password Policy"
-
-# Get the user object with error handling
-try {
-    $user = Get-ADUser $userName -Properties msDS-ResultantPSO, LockedOut, LastBadPasswordAttempt, BadPwdCount
-    if (!$user) {
-        throw "User not found"
-    }
-} catch {
-    Write-Host "Error: Unable to retrieve user '$userName'. Please check the username and your permissions." -ForegroundColor Red
-    exit
-}
-
-# Get the applied password policy
-$appliedPolicy = $user.'msDS-ResultantPSO'
-
-# Check if the policy is applied
-if ($appliedPolicy -eq $policyName) {
-    Write-Host "The Fine-Grained Password Policy '$policyName' is correctly applied to user '$userName'." -ForegroundColor Green
-} else {
-    Write-Host "Warning: The expected policy '$policyName' is not applied to user '$userName'." -ForegroundColor Yellow
-    if ($appliedPolicy) {
-        Write-Host "The applied policy is: $appliedPolicy" -ForegroundColor Yellow
-    } else {
-        Write-Host "No Fine-Grained Password Policy is applied to this user." -ForegroundColor Red
-    }
-}
-
-# Display the effective password policy settings for the user
-try {
-    $effectivePolicy = Get-ADUserResultantPasswordPolicy $userName
-    if ($effectivePolicy) {
-        Write-Host "`nEffective Password Policy Settings:" -ForegroundColor Cyan
-        $effectivePolicy | Format-List MinPasswordLength, PasswordHistoryCount, MinPasswordAge, MaxPasswordAge, LockoutThreshold, LockoutDuration
-    } else {
-        Write-Host "No effective password policy found for user '$userName'." -ForegroundColor Yellow
-    }
-} catch {
-    Write-Host "Error retrieving effective password policy: $_" -ForegroundColor Red
-}
-
-# Display current account status
-Write-Host "`nCurrent Account Status:" -ForegroundColor Cyan
-Write-Host "Locked Out: $($user.LockedOut)"
-Write-Host "Last Bad Password Attempt: $($user.LastBadPasswordAttempt)"
-Write-Host "Bad Password Count: $($user.BadPwdCount)"
-
-# Test password change
-$testPassword = Read-Host "Enter a test password to verify policy enforcement" -AsSecureString
-$plainTextPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($testPassword))
-
-if (Test-Password -UserName $userName -Password $plainTextPassword) {
-    Write-Host "`nPassword change successful. This password meets the policy requirements." -ForegroundColor Green
-} else {
-    Write-Host "`nPassword change failed. This password does not meet the policy requirements." -ForegroundColor Red
-}
-
-# Reset to a known good password with confirmation prompt
-$resetPassword = Read-Host "Do you want to reset the account to a known good password? (y/n)"
-if ($resetPassword -eq 'y') {
-    $goodPassword = Read-Host "Enter a known good password to reset the account" -AsSecureString
-    Set-ADAccountPassword -Identity $userName -NewPassword $goodPassword -Reset
-    Write-Host "`nVerification complete. The account has been reset to a known good password." -ForegroundColor Green
-} else {
-    Write-Host "Password reset operation was skipped." -ForegroundColor Yellow
-}
+Get-ADUserResultantPasswordPolicy -Identity <username> | Format-List
 ```
 
-# Run the Script
-Execute the script by typing its name:
-
-```
-.\Verify-FGPP.ps1
-
-```
+This command retrieves the effective password policy (Fine-Grained or default domain) applied to the specified user. It will display key details like minimum password length, history, age limits, and lockout thresholds without requiring scripting. Just replace `<username>` with the actual username.
