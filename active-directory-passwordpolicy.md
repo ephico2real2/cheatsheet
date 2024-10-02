@@ -48,6 +48,20 @@ The script creates an FGPP named "EnhancedPasswordPolicy" with the following set
 9. **Complexity Enabled**: Yes
 10. **Reversible Encryption**: Disabled
 
+The main reason why only the following policies are applicable in Active Directory is due to the native limitations of AD:
+
+- **Precedence**: Determines policy priority (lower number, higher priority).
+- **Password length**: 15 characters is a valid minimum length.
+- **Password history**: AD can remember up to 24 previous passwords.
+- **Minimum/Maximum password age**: AD supports these, though **minimum age** is set in days, not hours.
+- **Account lockout settings**: AD supports these for security.
+- **Complexity**: AD enforces a mixture of uppercase, lowercase, numbers, and special characters, but cannot enforce preventing parts of first name, last name, or username without custom solutions.
+- **Reversible Encryption**: Disabled for security.
+
+### Out of Scope
+In contrast, the original policy about preventing parts of the username, first name, or last name is not directly enforceable through AD without a **custom password filter** DLL, which requires advanced development and security considerations.
+
+
 ### Policy Application
 The policy is applied to the "Domain Users" group, affecting all standard user accounts in the domain.
 
