@@ -175,6 +175,15 @@ To remove the policy:
 By following this guide, you should be able to successfully create and apply a Fine-Grained Password Policy in your Active Directory environment.
 
 
+## Verifications:
+
+```
+notepad Verify-FGPP.ps1
+
+```
+
+## Add the following
+
 ```powershell
 # Import the Active Directory module
 Import-Module ActiveDirectory
