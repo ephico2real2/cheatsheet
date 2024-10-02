@@ -39,3 +39,43 @@ spec:
 
 
 ```
+
+
+You're correct. When you manually create a `Secret` of type `kubernetes.io/service-account-token` and name it explicitly (e.g., `my-service-account-token`), the token name won't be automatically assigned by Kubernetes as in the previous case where the token secret was automatically generated and associated with the service account.
+
+In this case, you need to refer to the explicit name you've given the token secret (`my-service-account-token`) instead of dynamically fetching it. Here's the updated workflow:
+
+### Updated Kubernetes Job:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: token-extractor-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: token-extractor
+        image: bitnami/kubectl:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          TOKEN=$(kubectl get secret my-service-account-token -o jsonpath='{.data.token}' | base64 --decode)
+          kubectl create secret generic app-secret --from-literal=SERVICE_ACCOUNT_TOKEN=$TOKEN --dry-run=client -o yaml | kubectl apply -f -
+      restartPolicy: OnFailure
+```
+
+### Key Changes:
+- **Fixed Secret Name:**
+  - Instead of dynamically fetching the token name, we directly reference the secret by the name you explicitly gave it: `my-service-account-token`.
+
+- **Token Extraction:**
+  - We use the same `kubectl get secret` command, but now with the fixed secret name (`my-service-account-token`) to extract the token data.
+
+- **Base64 Decode:**
+  - The token is stored as base64-encoded, so the `base64 --decode` is used to decode it before applying it to the new secret.
+
+This approach should work since the secret is being manually created with a known name. Now, you can extract the token from the specific `my-service-account-token` secret and apply it as part of your Kubernetes Job.
+
+Does this meet your requirements, or would you like any further adjustments?
