@@ -45,6 +45,36 @@ You're correct. When you manually create a `Secret` of type `kubernetes.io/servi
 
 In this case, you need to refer to the explicit name you've given the token secret (`my-service-account-token`) instead of dynamically fetching it. Here's the updated workflow:
 
+
+To regenerate the secret of type `kubernetes.io/service-account-token` with the correct association to your service account (`my-service-account`), here is the YAML manifest for you:
+
+### Regenerated Secret YAML:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-service-account-token
+  annotations:
+    kubernetes.io/service-account.name: "my-service-account"
+type: kubernetes.io/service-account-token
+```
+
+### Notes:
+- The `name: my-service-account-token` in the metadata section specifies the name of the secret.
+- The `annotations` section includes the `kubernetes.io/service-account.name` annotation, which links the secret to the service account `my-service-account`.
+- The `type: kubernetes.io/service-account-token` ensures that Kubernetes will automatically populate this secret with the token associated with the `my-service-account` service account.
+
+Once you apply this YAML, Kubernetes will generate and fill in the token data for the service account.
+
+You can apply this YAML using `kubectl`:
+
+```bash
+kubectl apply -f secret.yaml
+```
+
+Let me know if you need further customization or assistance with this process!
+
 ### Updated Kubernetes Job:
 
 ```yaml
