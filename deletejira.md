@@ -1,40 +1,40 @@
-Here is a suggested Jira story to update the Active Directory (AD) password policy:
-
+Sample
 ---
 
-**Title:** Update Active Directory Password Policy in Sandbox Environment
+**Summary:**  
+Deploy KCS Webhook for OpenShift Alerts and Create Kustomize Patches for Dynamic Configuration
 
-**Description:**
+**Description:**  
+The KCS webhook application was successfully deployed to the SDE OpenShift Kubernetes cluster using ArgoCD. This application is used for alerting in OpenShift, and the following tasks were completed as part of this deployment:
 
-As part of our security enhancement, we need to update the password policy in the Active Directory (AD) to align with Okta's policies and improve password security. The changes will first be implemented in the sandbox environment for testing before pushing to production.
+1. Organized deployment artifacts for the KCS webhook application.
+2. Created a deployment strategy involving the use of a token from a custom service account for communicating with the OpenShift Cluster API.
+3. Implemented a `Secret` specification to handle token generation for the service account.
+4. Verified that the deployment was successful in the SDE OpenShift Kubernetes cluster.
 
-The password policy will include the following:
+Additionally, to ensure the deployment is adaptable across different OpenShift clusters, the following tasks will be completed:
 
-- Minimum length of 15 characters.
-- Must not contain part of the username.
-- Must not contain the user's first name.
-- Must not contain the user's last name.
-- Enforce password history for the last 24 passwords.
-- Minimum password age set to 1 hour.
-- Lock the user after 10 unsuccessful attempts.
-- Automatically unlock the account after 30 minutes.
+5. **Create Kustomize Patch for `OCP_URL`**:  
+   A patch file will be created to dynamically manage the `OCP_URL` variable in the deployment spec, as the OpenShift Cluster API URL varies between target clusters.
+
+6. **Create Kustomize Patch for Webhook Route Host**:  
+   Another patch file will be created to manage the OpenShift route host for the webhook, as this varies for each target cluster.
 
 **Acceptance Criteria:**
 
-- [ ] Ensure the password policy is updated in the sandbox AD environment.
-- [ ] Test the new password policy by creating users and validating compliance with the new rules.
-- [ ] Verify the lockout behavior after 10 unsuccessful attempts and confirm automatic unlocking after 30 minutes.
-- [ ] Document any issues encountered during the sandbox implementation and potential changes needed before applying to production.
-- [ ] Review and confirm the password history and minimum password age settings are applied correctly.
-- [ ] All changes to be reviewed and signed off before deployment to production.
+- [ ] Deployment artifacts for the KCS webhook are organized and stored in the correct location.
+- [ ] The token from the custom service account is correctly used to communicate with the OpenShift Cluster API.
+- [ ] The KCS webhook application is successfully deployed and functional in the SDE OpenShift Kubernetes cluster.
+- [ ] Kustomize patch file for managing the `OCP_URL` is created and applied to the deployment spec.
+- [ ] Kustomize patch file for managing the OpenShift route host is created and applied.
+- [ ] Alerts are triggered as expected based on OpenShift events in the SDE cluster.
 
-**Priority:** Medium  
-**Labels:** Active Directory, Security, Sandbox  
+**Priority:** Medium
 
-**Assignee:** (Assign yourself or the relevant team member)  
-**Reporter:** (Your name)  
-**Sprint:** (Add to the relevant sprint if applicable)
+**Assignee:** [Your Name]
+
+**Labels:** OpenShift, ArgoCD, Kustomize, KCS Webhook, Deployment
+
+**Components:** Kubernetes, Alerts, Kustomize
 
 ---
-
-Feel free to adjust any of the details, including the priority or sprint, based on your team's workflow!
