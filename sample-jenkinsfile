@@ -1,0 +1,411 @@
+#!/usr/bin/env groovy
+
+@Library('tools') _
+import com.jamf.jenkins.KanikoBuild
+import java.text.SimpleDateFormat
+
+branch = branch()
+release = branch == 'prod'
+repository = release ? 'ga' : 'test'
+buildtype = 'dev'
+
+pipeline {
+    agent {
+        kubernetes {
+            defaultContainer 'helm-helper'
+            yaml '''
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      serviceAccountName: ecr-ci-sa
+                      containers:
+                      - name: helm-helper
+                        image: docker.jamf.build/engineering/ci/jamf-remote-assist-deployment:latest
+                        tty: true
+                        command:
+                        - cat
+                      - name: sonar
+                        image: docker.jamf.build/sonarsource/sonar-scanner-cli:latest
+                        tty: true
+                        command:
+                        - cat
+                 '''
+        }
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '6')) // Keeps only the last 3 builds
+    }
+    parameters {
+        choice(
+            choices: ['euw2', 'use1'],
+            description: 'Select the Kubernetes region for deployment.',
+            name: 'REGION'
+        )
+        booleanParam(
+            defaultValue: true,
+            description: 'Switch for controlling region selection.',
+            name: 'DEPLOY_TO_ALL_REGIONS'
+        )
+    }
+
+    environment {
+        PROJECT = 'jamf-insights'
+        SLACK_CHANNEL = "djk8s"
+        SONARPROJECT = "jamf-insights"
+        SONAR_URL = "https://sonarqube.jamf.build"
+        IMAGE_TAG = "${env.GIT_COMMIT.take(7)}"
+        HELM_MANIFEST_REPO = "git@github.com:jamf/datajar-k8s-manifests.git"
+        HELM_REPO_BRANCH = "cicd"
+        VALUES_PATH = "portal/web"
+        CRON_VALUES_PATH = "portal/jamf-insights-cron"
+        BUILDTYPE = 'dev'
+        GIT_COMMITTER_EMAIL = "django@jamf.com"
+        GIT_COMMITTER_NAME = "DJango Automation"
+        ALL_REGIONS = "euw2,use1" // Store regions as a comma-seperated string #
+        IMAGE_BUILD_SUCCESSFUL = false // Initialize a variable to track the build status
+    }
+
+    stages {
+        //Build images
+        stage('Build Image') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'dev'
+                    branch 'prod'
+                    branch 'feature/nebula-stylesheet'
+                }
+            }
+            agent {
+                kubernetes {
+                    yaml KanikoBuild.getDefaultAgentYaml()
+                }
+            }
+            steps {
+                script {
+                    logCurrentTime("Build jamf-insights started at")
+                    kanikoBuild {
+                        debug true
+                        dockerfile "./dev/web/Dockerfile"
+                        registry '359585083818.dkr.ecr.us-east-1.amazonaws.com'
+                        image "jamf/$repository/datajar/jamf-insights"
+                        tag "${env.GIT_COMMIT.take(7)}"
+                        buildArgs "build_type=${buildtype}"
+                        serviceAccountName 'ecr-ci-sa'
+                        args "--compressed-caching=false" 
+                        awsRoleArn 'arn:aws:iam::359585083818:role/ecr-ci'
+                    }
+                    logCurrentTime("Build jamf-insights completed at")
+                }
+            }
+            post {
+                success {
+                    script {
+                        // Set the variable to true if the build is successful
+                        env.IMAGE_BUILD_SUCCESSFUL = 'true'
+                    }
+                }
+           }
+        }
+        stage('UpdateImage tags for Dev and Custom Branch for SBOX deploy') {
+            when {
+                beforeAgent true
+                anyOf {
+                    //branch 'dev'
+                    branch 'feature/nebula-stylesheet'
+                }
+            }            
+            steps {
+                script {
+                    def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+                    ['sbox'].each { envName ->
+                        sshagent(['django-github-k8s']) {
+                            container('helm-helper') {
+                                regionsList.each { region ->
+                                    echo "Deploying ${envName} to region ${region}"
+                                    deployToEnvironment(envName, region)
+                                    echo "please let me sleep for 10 seconds more"
+                                    sleep(time:10, unit: "SECONDS")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('UpdateImage tags for Dev and Custom Branch for Dev deploy') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'dev'
+                }
+            }            
+            steps {
+                script {
+                    def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+                    ['dev'].each { envName ->
+                        sshagent(['django-github-k8s']) {
+                            container('helm-helper') {
+                                regionsList.each { region ->
+                                    echo "Deploying ${envName} to region ${region}"
+                                    deployToEnvironment(envName, region)
+                                    echo "please let me sleep for 10 seconds more"
+                                    sleep(time:10, unit: "SECONDS")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+
+        // Start Stage Helm chart updates
+        stage('UpdateImage tags for Stage Deploy') {
+            // Execute this stage only if the branch is 'stage'
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'prod'
+                }
+            }
+            steps {
+                script {
+                    sshagent(['django-github-k8s']) {
+                        container('helm-helper') {
+                            def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+                            regionsList.each { region ->
+                                echo "Updating image for stage in region ${region}"
+                                deployToEnvironment('stage', region)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Start Prod Helm chart updates
+        // Execute this stage only if the branch is 'prod'
+        stage('UpdateImage tags for Prod Deploy') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'prod'
+                }
+            }
+            steps {
+                sshagent(['django-github-k8s']) {
+                    container('helm-helper') {
+                        script {
+                            def regionsList = params.DEPLOY_TO_ALL_REGIONS ? env.ALL_REGIONS.tokenize(',') : [params.REGION]
+                            regionsList.each { region ->
+                                // Log a message to the console output providing context about the input request
+                               try {
+                                    logCurrentTime("Ready to promote to 'prod' in region ${region}. Please confirm to proceed.")
+                                    // Time unit for the timeout, e.g., SECONDS | MINUTES | HOURS | DAYS
+                                    timeout(time: 3, unit: 'MINUTES' ) {
+                                        // Requesting confirmation for each region with the default action set to not proceed
+                                        def userInput = input(
+                                            id: 'confirmPromotion',
+                                            message: "Ready to promote to 'prod' in region ${region}?",
+                                            parameters: [
+                                                [$class: 'BooleanParameterDefinition',
+                                                defaultValue: false, // Ensures the default action is to not proceed
+                                                description: 'Check to confirm, then click proceed below',
+                                                name: 'Proceed']
+                                            ]
+                                        )
+                                        if (userInput == true) {
+                                            echo "Promoting to prod in region ${region}"
+                                            deployToEnvironment('prod', region)
+                                            logCurrentTime("Promotion to 'prod' in region ${region} completed.")
+                                        } else {
+                                            echo "Skipping promotion to prod in region ${region}"
+                                            logCurrentTime("Promotion to 'prod' in region ${region} skipped.")
+                                        }
+                                    }
+                               } catch (err) {
+                                   logCurrentTime("Timeout reached or promotion to 'prod' in region ${region} was not confirmed.")
+                                   echo "Setting build to UNSTABLE due to timeout or lack of confirmation."
+                                   currentBuild.result = 'UNSTABLE'
+                                   echo "Moving to the next region or concluding the promotion process."
+                               }   
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                    not { changeRequest() }
+                }
+            }
+            steps {
+                container('sonar') {
+                    script {
+                        performSonarQubeAnalysis()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                reportDir: 'build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'Gradle Build Report',
+                keepAll: true
+            ])
+        }
+    }
+}
+
+
+// Define all custom Jenkins utility functions
+
+// Define a reusable function for time logging
+def logCurrentTime(String context = "Time Log") {
+    def sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    echo "${context}: ${sdf.format(new Date())}"
+}
+
+// Define a reusable function Git Setup
+def setupGitConfig() {
+    echo 'Setting up git configuration'
+    env.GIT_SSH_COMMAND = 'ssh -o StrictHostKeyChecking=no'
+    sh """
+    git config --global user.email "${env.GIT_COMMITTER_EMAIL}"
+    git config --global user.name "${env.GIT_COMMITTER_NAME}"
+    """
+}
+
+// Define a reusable function for repo setup
+def cloneRepository(String repoDirectory) {
+    try {
+        echo "Cloning repository from ${env.HELM_MANIFEST_REPO} into ${repoDirectory}"
+        
+        sh """
+        set -x
+        git clone --single-branch --branch ${env.HELM_REPO_BRANCH} ${env.HELM_MANIFEST_REPO} ${repoDirectory}
+        """
+        
+        echo "Repository cloned successfully into ${repoDirectory}"
+    } catch (Exception e) {
+        echo "Error while cloning repository: ${e.getMessage()}"
+        throw e // Rethrow the exception to handle it at a higher level or fail the build
+    }
+}
+
+// Define a reusable function for helm valuas file update
+def updateHelmValues(String fileName, String valuesPath) {
+    try {
+        echo "Updating Helm values file: ${valuesPath}/${fileName} with image tag ${env.IMAGE_TAG}"
+        
+        sh """
+        set -x
+        yq eval '.image.tag = \"${env.IMAGE_TAG}\"' -i ${valuesPath}/${fileName} >&2 || true
+        """
+        
+        echo "Helm values file updated successfully."
+    } catch (Exception e) {
+        echo "Error while updating Helm values file: ${e.getMessage()}"
+        throw e // Rethrow the exception to handle it at a higher level or fail the build
+    }
+}
+
+// Define a reusable function for helm valuas file update
+def cronupdateHelmValues(String cronfileName, String cronvaluesPath) {
+    try {
+        echo "Updating CRON Patch Helm values file: ${cronvaluesPath}/${cronfileName} with image tag ${env.IMAGE_TAG}"
+        
+        sh """
+        set -x
+        yq eval '.image.tag = \"${env.IMAGE_TAG}\"' -i ${cronvaluesPath}/${cronfileName} >&2 || true
+        """
+        
+        echo "Cron Helm values file updated successfully."
+    } catch (Exception e) {
+        echo "Error while updating Cron Helm values file: ${e.getMessage()}"
+        throw e // Rethrow the exception to handle it at a higher level or fail the build
+    }
+}
+
+// Define a reusable function for  Git commit and push
+def gitCommitAndPush(String repoDirectory) {
+        try {
+            echo "Committing and pushing changes..."
+            sh """
+            set -x
+            git add . >&2 || true
+            git commit -m "Promote ${env.HELM_REPO_BRANCH} environment with new image tag: ${env.IMAGE_TAG}" >&2 || true
+            git diff --stat --staged origin/${env.HELM_REPO_BRANCH} >&2 || true
+            git push origin >&2 || true
+            """
+            echo "Changes have been pushed successfully."
+        } catch (Exception e) {
+            echo "Error while committing and pushing: $e"
+            throw e // Re-throw the exception to ensure the build fails appropriately
+        }
+}
+
+// Define a reusable helm update deployer function
+def deployToEnvironment(String environmentPart, String regions) {
+    def repoDirectory = "helm-${UUID.randomUUID().toString().take(8)}"
+    try {
+        setupGitConfig() // Ensure git configuration is set before operations
+        cloneRepository(repoDirectory)
+
+        def regionList = regions.tokenize(',')
+
+        dir(repoDirectory) {
+            regionList.each { regionPart ->
+                def valuesfileName = "values-${environmentPart}-${regionPart}.yaml"
+                def cronvaluesfileName = "cron-values-patch-${environmentPart}.yaml"
+                
+                // Check if the Helm values file exists for web and queue for each region before updating
+                if (!fileExists("${env.VALUES_PATH}/${valuesfileName}")) {
+                    echo "WARNING: File ${env.VALUES_PATH}/${valuesfileName} does not exist. Skipping update for this file."
+                } else {
+                    updateHelmValues(valuesfileName, env.VALUES_PATH)
+                }
+                // Check if cron values exits
+                if (!fileExists("${env.CRON_VALUES_PATH}/${cronvaluesfileName}")) {
+                    echo "WARNING: File ${env.CRON_VALUES_PATH}/${cronvaluesfileName} does not exist. Skipping update for this file."
+                } else {
+                    cronupdateHelmValues(cronvaluesfileName, env.CRON_VALUES_PATH)
+                }
+            }
+
+            // Attempt to commit and push changes even if there were errors in previous steps
+            //gitCommitAndPush(repoDirectory, env.HELM_REPO_BRANCH)
+            gitCommitAndPush(repoDirectory)
+        }
+    } catch (Exception e) {
+        echo "An error occurred during deployment: ${e.message}. Continuing with the pipeline."
+    }
+}
+
+// Define a reusable function for SonarQube Analysis
+def performSonarQubeAnalysis() {
+    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+        def gitUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+        echo "Git URL: $gitUrl"
+
+        sh '''
+            sonar-scanner \
+            -Dsonar.host.url="${SONAR_URL}" \
+            -Dsonar.login="${SONAR_AUTH_TOKEN}" \
+            -Dsonar.branch.name="${BRANCH_NAME}" \
+            -Dsonar.projectKey="${SONARPROJECT}" \
+            -Dsonar.python.version="3" \
+            -Dsonar.sources=.
+        '''
+    }
+}
