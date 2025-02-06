@@ -21,24 +21,46 @@ Create the file `/usr/local/dotmobi-tools/scripts/system-monitor.py` with the fo
 ```python
 #!/usr/bin/env python3
 import os
+import sys
+import logging
 from datetime import datetime
 
 # Use the environment variable SYSTEM_MONITOR_LOG_DIR if set; otherwise, default to /usr/local/api/logs.
 log_dir = os.environ.get("SYSTEM_MONITOR_LOG_DIR", "/usr/local/api/logs")
-# Ensure the directory exists (it will be created if it doesn't).
+# Ensure the directory exists.
 os.makedirs(log_dir, exist_ok=True)
 # Define the log file path by appending a filename to the directory.
 log_file = os.path.join(log_dir, "system-monitor.log")
 
-# Create a timestamped log entry.
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-log_entry = f"{timestamp} - System Monitor executed.\n"
+# Configure the logger.
+logger = logging.getLogger("SystemMonitor")
+logger.setLevel(logging.INFO)
 
-try:
-    with open(log_file, "a") as f:
-        f.write(log_entry)
-except Exception as e:
-    print(f"Error writing to log file {log_file}: {e}")
+# Create a formatter that includes a timestamp.
+formatter = logging.Formatter(
+    fmt='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+# File handler for logging to the file (appends by default).
+file_handler = logging.FileHandler(log_file)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+# Console handler for logging to the console.
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+
+# Add both handlers to the logger.
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+# Obtain the current OS time.
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# Log the message, including the current time.
+logger.info(f"System Monitor executed {current_time}")
+
 ```
 
 Make the script executable:
