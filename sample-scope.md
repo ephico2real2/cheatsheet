@@ -81,3 +81,35 @@ Leverage AWS CloudWatch Logs to capture systemd service failure events (recorded
 - **Documentation:** The configuration process and testing instructions are documented on Confluence, with a link updated in the Git README.
 
 ---
+
+### **JIRA-010: Scheduled OS Update via Appleboy SSH Action with Conditional Trigger**
+
+**Description:**  
+Implement a GitHub Actions workflow (`.github/workflows/update-os.yml`) that remotely updates the EC2 OS using `appleboy/ssh-action@master`. The workflow should:
+
+- Use existing SSH variables (`SSH_HOST`, `SSH_USERNAME`, `SSH_PRIVATE_KEY`) from `deploy.yaml`.
+- Run the OS update commands:
+  ```bash
+  export NEEDRESTART_MODE=a
+  export DEBIAN_FRONTEND=noninteractive
+  export DEBIAN_PRIORITY=critical
+  sudo -E apt-get -qy clean
+  sudo -E apt-get -qy update
+  sudo -E apt-get -qy -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" upgrade
+  ```
+- Trigger on a schedule (e.g., daily at 3 AM UTC) and via manual dispatch (`workflow_dispatch`).
+- **Also trigger conditionally** when an environment variable (e.g., `RUN_OS_UPDATE`) is set to `true`.
+- Update the Confluence documentation and add a link in the Git README.
+
+**Tasks:**  
+- Create the `update-os.yml` workflow with scheduled, manual, and conditional triggers (using an `if: ${{ env.RUN_OS_UPDATE == 'true' }}` condition).
+- Integrate the SSH action using the existing SSH variables.
+- Verify that the OS update commands execute correctly on the remote EC2 instance.
+- Update internal documentation (Confluence) and link it in the Git README.
+
+**Acceptance Criteria:**  
+- The workflow file exists and correctly triggers on schedule, manual dispatch, and when `RUN_OS_UPDATE` is set.
+- The remote EC2 instance is updated via SSH with the proper commands.
+- Documentation is updated and linked in the Git README.
+
+---
