@@ -1,137 +1,157 @@
-I understand that you're providing support for existing systems rather than implementing new monitoring. Let me revise the stories to better reflect your support role and remove tasks related to implementation.
+Epic to reflect that your role is to provide recommendations to the MFTS team, who then implements the fixes and documents solutions for non-platform issues.
 
 # Epic: IBM Sterling Container Platform Support and Upgrade Management
 
 ## Epic Description
-As an OpenShift engineer, provide infrastructure support and upgrade management for containerized IBM Sterling products deployed across MFTS PRE PHX and MFTS PROD EWD OpenShift clusters. Ensure container platform health, security compliance, and seamless upgrades while supporting the MFTS team's operations.
+As an OpenShift engineer, provide infrastructure support, recommendations, and troubleshooting expertise for containerized IBM Sterling products deployed across MFTS PRE PHX and MFTS PROD EWD OpenShift clusters. Support the MFTS team by identifying issues related to GitLab CI/CD pipelines, Helm chart deployments, Network Policies, and other OpenShift components, providing recommendations that the MFTS team will implement and document for non-platform issues.
 
 ## Epic Acceptance Criteria
-- Establish standardized procedures for container updates on both clusters
-- Maintain container platform health during upgrade processes
-- Document all OpenShift configuration changes for compliance purposes
-- Support MFTS team with container-related troubleshooting
-- Coordinate with IBM and MFTS team for product updates
-- Resolve Security Context Constraints (SCC), container start errors, and rolebinding issues
-- Verify logging systems are working correctly
+- Provide expert troubleshooting and recommendations for OpenShift-related issues
+- Support container platform health during upgrade processes
+- Identify OpenShift configuration issues affecting IBM Sterling containers
+- Provide recommendations for resolving Security Context Constraints (SCC), container start errors, and rolebinding issues
+- Support log system validation
+- Identify issues with GitLab CI/CD pipeline and Helm chart deployments
+- Provide recommendations for Network Policy configurations
+- Assist in identifying OpenShift-specific issues for IBM vendor support
 
 ## Stories
 
 ### Story 1: IBM Sterling File Gateway Container Support
-**Title**: Support and Upgrade Sterling File Gateway Container Infrastructure
+**Title**: Support and Provide Recommendations for Sterling File Gateway Container Infrastructure
 
 **Description**:  
-As an OpenShift engineer, I need to support the container infrastructure and upgrade processes for IBM Sterling File Gateway to ensure platform stability for the MFTS team.
+As an OpenShift engineer, I need to support the MFTS team by troubleshooting container infrastructure issues and providing recommendations for IBM Sterling File Gateway to ensure platform stability.
 
 **Tasks**:
-- Review and apply OpenShift patches and upgrades 
-- Troubleshoot container start errors affecting File Gateway
-- Update Security Context Constraints (SCC) as required
-- Fix rolebinding issues impacting container permissions
-- Maintain container registry access and image management
-- Support MFTS team with container logs and diagnostic information
-- Validate OpenShift ELK logging and Splunk forwarding for File Gateway containers
+- Review OpenShift platform configurations affecting File Gateway
+- Diagnose container start errors and provide resolution recommendations
+- Analyze Security Context Constraints (SCC) issues and suggest updates
+- Identify rolebinding issues and provide correction recommendations
+- Diagnose GitLab CI/CD pipeline and Helm chart deployment issues
+- Analyze Network Policy issues and provide configuration recommendations
+- Help identify OpenShift-specific issues for IBM vendor support
 
 **Acceptance Criteria**:
-- Container start errors resolved within SLA
-- SCC configurations properly updated and maintained
-- Rolebinding issues resolved to ensure proper access
-- OpenShift platform maintained at supported version
-- Logging systems verified functional for troubleshooting
+- Accurate diagnoses of container platform issues provided
+- Clear recommendations for resolving SCC configurations
+- Detailed recommendations for Network Policy configurations
+- Root causes of platform-related issues identified
 
 ### Story 2: IBM Sterling External Authentication Server Container Support
-**Title**: Support and Upgrade Sterling EAS Container Infrastructure
+**Title**: Support and Provide Recommendations for Sterling EAS Container Infrastructure
 
 **Description**:  
-As an OpenShift engineer, I need to support the container infrastructure for IBM Sterling External Authentication Server to maintain platform stability for authentication services.
+As an OpenShift engineer, I need to support the MFTS team by troubleshooting container infrastructure issues and providing recommendations for IBM Sterling External Authentication Server.
 
 **Tasks**:
-- Manage and update Security Context Constraints for EAS containers
-- Troubleshoot container initialization and start errors
-- Resolve rolebinding issues affecting service accounts
-- Maintain OpenShift container security context constraints
-- Validate logging functionality for EAS containers
-- Support MFTS team with platform-related authentication issues
+- Diagnose Security Context Constraints issues and provide recommendations
+- Analyze container initialization errors and suggest solutions
+- Identify rolebinding issues and provide correction recommendations
+- Diagnose GitLab pipeline and Helm chart deployment failures
+- Analyze Network Policy issues and suggest configurations
+- Help identify OpenShift-specific issues for IBM vendor support
 
 **Acceptance Criteria**:
-- Container start errors diagnosed and resolved promptly
-- SCC updates implemented according to security requirements
-- Rolebinding configurations corrected to ensure proper access
-- Logging systems functioning properly for troubleshooting
+- Accurate diagnoses of container platform issues provided
+- Clear recommendations for resolving container start errors
+- Detailed recommendations for correcting rolebinding issues
+- Root causes of deployment failures identified
 
 ### Story 3: IBM Sterling Secure Proxy Container Support
-**Title**: Support and Upgrade Sterling Secure Proxy Container Infrastructure
+**Title**: Support and Provide Recommendations for Sterling Secure Proxy Container Infrastructure
 
 **Description**:  
-As an OpenShift engineer, I need to support the container infrastructure for IBM Sterling Secure Proxy to ensure platform stability for secure communications.
+As an OpenShift engineer, I need to support the MFTS team by troubleshooting container infrastructure issues and providing recommendations for IBM Sterling Secure Proxy.
 
 **Tasks**:
-- Update Security Context Constraints for proxy containers
-- Troubleshoot and resolve container startup failures
-- Fix service account rolebinding issues
-- Validate logging functionality for proxy containers
-- Support certificate management at container platform level
-- Document container platform configurations for Secure Proxy
+- Analyze Security Context Constraints issues and provide recommendations
+- Diagnose container startup failures and suggest solutions
+- Identify rolebinding issues and provide correction recommendations
+- Analyze GitLab CI/CD and Helm chart configuration problems
+- Diagnose Network Policy issues and suggest configurations
+- Help identify OpenShift-specific issues for IBM vendor support
 
 **Acceptance Criteria**:
-- Container startup issues resolved within SLA
-- SCC configurations properly maintained for security requirements
-- Rolebinding issues resolved to ensure proper service function
-- ELK stack and Splunk forwarding validated for log access
+- Accurate diagnoses of container platform issues provided
+- Clear recommendations for resolving container startup failures
+- Detailed recommendations for Network Policy configurations
+- Root causes of platform-related issues identified
 
 ### Story 4: IBM Inventory Tool for SCCM Container Support
-**Title**: Support and Upgrade IBM Inventory Tool Container Infrastructure
+**Title**: Support and Provide Recommendations for IBM Inventory Tool Container Infrastructure
 
 **Description**:  
-As an OpenShift engineer, I need to support the container infrastructure for IBM Inventory Tool for Microsoft SCCM to ensure platform stability.
+As an OpenShift engineer, I need to support the MFTS team by troubleshooting container infrastructure issues and providing recommendations for IBM Inventory Tool for Microsoft SCCM.
 
 **Tasks**:
-- Manage Security Context Constraints for Inventory Tool containers
-- Diagnose and fix container startup errors
-- Resolve rolebinding issues for service accounts
-- Apply OpenShift platform updates and patches
-- Validate logging system functionality
-- Support MFTS team with container platform issues
+- Analyze Security Context Constraints issues and provide recommendations
+- Diagnose container start errors and suggest solutions
+- Identify rolebinding issues and provide correction recommendations
+- Diagnose GitLab pipeline and Helm chart deployment problems
+- Analyze Network Policy issues and suggest configurations
+- Help identify OpenShift-specific issues for IBM vendor support
 
 **Acceptance Criteria**:
-- Container startup errors resolved promptly
-- SCC configurations updated as needed
-- Rolebinding issues resolved for proper function
-- Logging systems verified functional for troubleshooting
+- Accurate diagnoses of container platform issues provided
+- Clear recommendations for resolving SCC configurations
+- Detailed recommendations for correcting rolebinding issues
+- Root causes of deployment failures identified
 
-### Story 5: Logging System Support
-**Title**: Validate and Support Logging Infrastructure for Sterling Containers
+### Story 5: IBM Vendor Support Diagnosis
+**Title**: Diagnose IBM Sterling Container Issues for Vendor Support
 
 **Description**:  
-As an OpenShift engineer, I need to validate and support the OpenShift ELK stack and Splunk log forwarding for IBM Sterling containers to ensure the MFTS team has access to necessary logs for troubleshooting.
+As an OpenShift engineer, I need to help the MFTS team identify OpenShift-specific issues and Helm chart problems that require IBM vendor support, providing detailed analysis for proper escalation.
 
 **Tasks**:
-- Verify ELK stack functionality for container logs
-- Validate Splunk log forwarding configuration
-- Troubleshoot log access issues
-- Support MFTS team with log retrieval as needed
-- Document logging system verification procedures
-- Validate log retention policies are correctly applied
+- Analyze container deployment failures to distinguish between OpenShift vs IBM product issues
+- Diagnose IBM Helm chart configuration errors
+- Collect relevant OpenShift logs and diagnostic information
+- Identify patterns in recurring IBM container issues
+- Provide OpenShift environment details relevant to support cases
+- Support MFTS team with technical analysis for IBM support cases
 
 **Acceptance Criteria**:
-- OpenShift ELK logging verified functional
-- Splunk log forwarding confirmed operational
-- Log access issues resolved within SLA
-- Documentation updated for log access procedures
+- Clear distinction between platform and product issues provided
+- Detailed technical analysis for IBM support cases
+- OpenShift-specific context provided for vendor escalations
+- Root causes of issues accurately identified
 
-### Story 6: Security Context Constraints Support
-**Title**: Maintain and Troubleshoot Security Context Constraints
+### Story 6: Network Policy Troubleshooting
+**Title**: Diagnose and Recommend Solutions for Network Policies
 
 **Description**:  
-As an OpenShift engineer, I need to maintain and troubleshoot Security Context Constraints for all IBM Sterling containerized applications to ensure security compliance while allowing proper functionality.
+As an OpenShift engineer, I need to diagnose Network Policy issues for all IBM Sterling containerized applications and provide recommendations to ensure secure communications.
 
 **Tasks**:
-- Respond to SCC-related container start failures
-- Update SCCs as required for application functionality
-- Troubleshoot permission issues related to SCCs
-- Document SCC configurations and changes
-- Support MFTS team with SCC-related questions
+- Diagnose connectivity issues related to Network Policies
+- Analyze Network Policy requirements for applications
+- Recommend Network Policy configuration changes
+- Provide technical guidance for network connectivity troubleshooting
+- Suggest secure network segmentation configurations
 
 **Acceptance Criteria**:
-- SCC-related issues resolved within SLA
-- Documentation maintained for SCC configurations
-- Container functionality restored after SCC changes
+- Root causes of network connectivity issues identified
+- Clear recommendations for Network Policy configurations
+- Technical guidance provided for complex networking issues
+- Security-compliant network configuration recommendations provided
+
+### Story 7: GitLab and Helm Deployment Troubleshooting
+**Title**: Diagnose CI/CD Pipeline and Helm Chart Deployment Issues
+
+**Description**:  
+As an OpenShift engineer, I need to diagnose GitLab CI/CD pipelines and Helm chart deployment issues for IBM Sterling containers and provide recommendations to the MFTS team.
+
+**Tasks**:
+- Diagnose GitLab pipeline failures
+- Analyze Helm chart deployment issues
+- Identify OpenShift permissions issues for service accounts
+- Diagnose image pull errors during deployments
+- Provide technical analysis for deployment troubleshooting
+
+**Acceptance Criteria**:
+- Root causes of GitLab pipeline issues identified
+- Clear analysis of Helm chart deployment problems provided
+- Technical recommendations for service account permissions
+- Accurate diagnosis of image pull failures
