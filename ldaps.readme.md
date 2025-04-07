@@ -194,3 +194,71 @@ After successful renewal, verification, and MSP confirmation:
    - Include validation evidence
    - Document the SSL check on port 636
    - Attach confirmation from MSP team
+  
+
+
+   #######
+
+   # LDAPS Certificate Renewal: Active Directory Domain Controllers
+
+## Summary
+Renew LDAPS certificate on the Active Directory domain controller and validate authentication continues to work with MSP team.
+
+## Description
+The current Active Directory LDAPS certificate is approaching expiration and needs to be renewed. This task involves importing the new certificate on the domain controller, validating the SSL configuration on port 636, and coordinating with the MSP team to ensure their authentication processes continue to work after the renewal.
+
+**Team Responsible:** Red Dawg
+
+**Background:**
+- LDAPS (Lightweight Directory Access Protocol over SSL) certificate secures directory service communications
+- Current certificate will expire soon, requiring renewal to maintain secure operations
+- MSP team relies on this certificate for their authentication processes
+
+## Level of Effort (LOE)
+
+| Task | Notes |
+|------|-------|
+| **Pre-work Assessment** | |
+| Document current certificate details (expiration, issuer, etc.) | Use MMC Certificate console |
+| Develop renewal plan with rollback options | Include maintenance window timing |
+| **Certificate Preparation** | |
+| Acquire new certificate from certificate authority | Submit request to internal/external CA |
+| Transfer certificate files to the domain controller | Use RDP session for secure transfer |
+| **Implementation** | |
+| Convert certificate and key to PFX format | Using GitBash on the server |
+| Import certificate to domain controller | Use MMC or command line |
+| Restart necessary services | AD DS services |
+| Validation testing | Verify LDAPS connectivity |
+| **MSP Coordination** | |
+| Schedule testing window with MSP team | Advance notice required |
+| Support MSP authentication testing | Be available during their testing |
+| Document confirmation from MSP | Get written verification |
+| **Documentation** | |
+| Update certificate inventory | Record new expiration date |
+| Document renewal process | For future reference |
+| Update monitoring for new expiration date | Set alert for next renewal |
+
+**Total Estimated LOE: Small-Medium (4-8 hours)**
+
+## Acceptance Criteria
+- [ ] New certificate successfully installed on the domain controller
+- [ ] SSL check validates successfully on port 636
+- [ ] MSP team confirms they can authenticate through LDAPS
+- [ ] Authentication logs show no errors related to certificate issues
+- [ ] Certificate inventory updated with new expiration date
+- [ ] Monitoring updated for new certificate expiration date
+
+## Dependencies
+- New certificate from certificate authority
+- Availability of MSP team for authentication testing
+- Maintenance window for AD DS service restart
+
+## Risk Assessment
+- **Impact:** High (Authentication failure would affect multiple systems)
+- **Probability:** Low (With proper planning and testing)
+- **Mitigation:** Create rollback plan and perform renewal during low-traffic hours
+
+## Attachments
+- Certificate renewal procedure document
+- Current certificate inventory list
+- Contact information for MSP team
