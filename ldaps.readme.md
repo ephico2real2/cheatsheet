@@ -1,10 +1,10 @@
-# How to Import LDAPS Certificates on Windows: A Step-by-Step Guide
+# How to Renew Active Directory LDAPS Certificates on Windows: A Step-by-Step Guide
 
-This guide explains how to import certificates and private keys for LDAPS (Lightweight Directory Access Protocol over SSL) on Windows systems.
+This guide explains how to renew and import certificates and private keys for Active Directory LDAPS (Lightweight Directory Access Protocol over SSL) on Windows Domain Controllers.
 
 ## Prerequisites
 - Certificate file (e.g., `certificate.crt`)
-- Private key file (e.g., `demo-app.key`)
+- Private key file (e.g., `datajar.key`)
 - Administrative access to the Windows server
 - One of the following tools for OpenSSL access:
   - GitBash for Windows (includes built-in OpenSSL)
@@ -18,13 +18,17 @@ The Windows certificate store requires certificates with private keys to be in P
 ### Option A: Using GitBash on Windows Server (Recommended)
 
 1. Install GitBash on your Windows AD server if not already installed
-2. Transfer your certificate and private key files to the Windows server
+2. Transfer your certificate and private key files to the Windows server:
+   - Start an RDP session to your Windows AD server
+   - Drag and drop the certificate bundle and key files directly from your local machine to a folder on the server
+   - If the files came in a zipped folder, extract them after transfer
+   - Create a dedicated folder for certificate operations (e.g., C:\Certificates)
 3. Open GitBash terminal
 4. Navigate to the directory containing your certificate and key files
 5. Run the following OpenSSL command:
 
 ```
-openssl pkcs12 -in certificate.crt -inkey demo-app.key -export -out demo-app.pfx
+openssl pkcs12 -in certificate.crt -inkey demo-ldap.key -export -out demo-ldap.pfx
 ```
 
 6. You'll be prompted to create a password for the PFX file
@@ -32,7 +36,7 @@ openssl pkcs12 -in certificate.crt -inkey demo-app.key -export -out demo-app.pfx
 
 **Note**: If you have intermediate or root certificates, you can include them in the command:
 ```
-openssl pkcs12 -in certificate.crt -inkey demo-app.key -certfile ca-chain.crt -export -out demo-app.pfx
+openssl pkcs12 -in certificate.crt -inkey demo-ldap.key -certfile ca-chain.crt -export -out demo-ldap.pfx
 ```
 
 ### Option B: Generate PFX on macOS/Linux and Transfer
@@ -43,10 +47,13 @@ Alternatively, you can create the PFX file on your macOS or Linux system and the
 2. Navigate to the directory containing your certificate and key files
 3. Run the same OpenSSL command:
    ```
-   openssl pkcs12 -in certificate.crt -inkey demo-app.key -export -out demo-app.pfx
+   openssl pkcs12 -in certificate.crt -inkey demo-ldap.key -export -out demo-ldap.pfx
    ```
 4. Enter and confirm a password when prompted
-5. Transfer the resulting PFX file to your Windows AD server using secure file transfer
+5. Transfer the resulting PFX file to your Windows AD server:
+   - Start an RDP session to the Windows AD server
+   - Drag and drop the demo-ldap.pfx file from your local machine to the server
+   - Place it in a dedicated folder for certificate operations
 
 ## Step 2: Import the PFX File Using MMC Console
 
@@ -69,7 +76,7 @@ Alternatively, you can create the PFX file on your macOS or Linux system and the
 4. Import the PFX file:
    - Right-click on "Certificates" → "All Tasks" → "Import"
    - Click "Next" on the Certificate Import Wizard
-   - Browse to your PFX file location and select your `demo-app.pfx` file
+   - Browse to your PFX file location and select your `demo-ldap.pfx` file
    - Click "Next"
 
 5. Enter the PFX password:
@@ -92,32 +99,44 @@ Alternatively, you can create the PFX file on your macOS or Linux system and the
 1. In the MMC console, refresh the "Certificates" folder under "Personal"
 2. Look for your imported certificate
 3. Verify it has a small key icon, indicating that the private key was successfully imported
+4. Compare the expiration date of the new certificate with the old one to confirm it has been extended
 
-## Step 4: Configure LDAPS to Use the Certificate
+## Step 4: Configure Active Directory to Use the New Certificate
 
 For Active Directory LDAPS, the certificate is automatically detected if:
 - It's in the computer's Personal store
 - It has Server Authentication in the Enhanced Key Usage section
-- The Subject Common Name (CN) matches the server's FQDN
+- The Subject Common Name (CN) matches the Domain Controller's FQDN
 
-If needed, restart the AD DS service:
+Since this is a renewal, you should restart the AD DS service to ensure it picks up the new certificate:
 ```
 net stop ntds && net start ntds
 ```
 
-## Step 5: Test LDAPS Connectivity
+After restarting, verify that the previous certificate is no longer in use by checking the certificate being presented on port 636.
 
-Test that LDAPS is working properly:
-1. Open `ldp.exe` (LDAP utility, part of AD tools)
-2. Go to Connection → Connect
-3. Enter your server name and port 636
-4. Check "SSL" option
-5. Click "OK" to test the connection
+## Step 5: Test LDAPS Connectivity and MSP Authentication
 
-Alternatively, use OpenSSL to test:
-```
-openssl s_client -connect servername:636 -showcerts
-```
+After renewing the certificate, it's critical to verify LDAPS is working correctly:
+
+1. Test basic LDAPS connectivity:
+   - Open `ldp.exe` (LDAP utility, part of AD tools)
+   - Go to Connection → Connect
+   - Enter your server name and port 636
+   - Check "SSL" option
+   - Click "OK" to test the connection
+
+2. Verify the new certificate is being presented:
+   - Use OpenSSL to check the certificate details:
+   ```
+   openssl s_client -connect servername:636 -showcerts
+   ```
+   - Confirm the expiration date matches your newly renewed certificate
+
+3. Coordinate with the MSP team:
+   - As mentioned in the Jira task, confirm that the MSP team can still authenticate after the certificate renewal
+   - Have them test authentication through port 636
+   - Document their confirmation for your renewal documentation
 
 ## Troubleshooting
 
@@ -144,18 +163,34 @@ If you encounter issues:
 Instead of the MMC console, you can import using PowerShell:
 ```powershell
 $pfxPassword = ConvertTo-SecureString -String "YourPfxPassword" -Force -AsPlainText
-Import-PfxCertificate -FilePath C:\path\to\demo-app.pfx -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
+Import-PfxCertificate -FilePath C:\path\to\demo-ldap.pfx -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
 ```
 
 Or using certutil:
 ```
-certutil -importpfx -p "YourPfxPassword" C:\path\to\demo-app.pfx
+certutil -importpfx -p "YourPfxPassword" C:\path\to\demo-ldap.pfx
 ```
 
-## Next Steps
+## Completing the Renewal Process
 
-After successful import and verification:
-1. Document the certificate details (expiration date, thumbprint, etc.)
-2. Set up monitoring for certificate expiration
-3. Plan for certificate renewal before expiration
-4. Have the MSP team validate they can authenticate using the LDAPS connection
+After successful renewal, verification, and MSP confirmation:
+
+1. Document the renewal:
+   - New certificate expiration date
+   - Certificate thumbprint
+   - Date of renewal
+   - Confirmation from MSP team that authentication still works
+
+2. Update your certificate inventory and calendar:
+   - Set reminders for the next renewal (typically 30-60 days before expiration)
+   - Document the renewal process for future reference
+
+3. Clean up:
+   - If necessary, remove expired certificates from the certificate store
+   - Securely delete any temporary files created during the process
+   - Ensure any PFX files are stored securely or deleted if no longer needed
+
+4. Close the Jira ticket:
+   - Include validation evidence
+   - Document the SSL check on port 636
+   - Attach confirmation from MSP team
