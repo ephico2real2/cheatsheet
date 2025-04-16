@@ -47,3 +47,82 @@ As a developer, I need our CI/CD pipeline updated to use MySQL 8.x to ensure all
 - [ ] Update CI/CD configuration to use MySQL 8.x for tests
 - [ ] Verify all automated tests pass with new database version
 - [ ] Document any changes made to testing infrastructure
+
+
+I'll update the stories to reflect that unit testing is handled by the development team:
+
+**STORY-101: Security Checker Implementation and Dependency Assessment**
+*Description:* As a System Development Engineer, implement security checking scripts to assess Django application dependencies and identify upgrade paths.
+
+*Acceptance Criteria:*
+- Security checking scripts (security_check.py, setup.sh) are implemented and working
+- Full dependency vulnerability assessment is completed
+- Security-sensitive packages are identified and prioritized
+- Dependency conflicts are documented with specific version requirements
+- Initial recommendation for Django 5 migration approach is documented
+
+*Story Points:* 5
+*Priority:* High
+
+---
+
+**STORY-102: Django 5 Upgrade with Dependency Conflict Resolution**
+*Description:* As a System Development Engineer, upgrade from Django 3.2 to Django 5.0 while resolving dependency conflicts through strategic downgrades.
+
+*Acceptance Criteria:*
+- Django core is successfully upgraded to version 5.0
+- JWT authentication package conflicts are resolved (djangorestframework-jwt downgraded to 1.7.1)
+- Cryptography stack conflicts are resolved (cryptography 41.0.5, pyOpenSSL 24.2.1)
+- MySQL client configuration issues are addressed
+- Updated requirements.txt is finalized with comments explaining version constraints
+- Coordinate with development team for unit and integration testing
+
+*Story Points:* 13
+*Priority:* Critical
+
+---
+
+**STORY-103: Container Environment Update for Django 5**
+*Description:* As a System Development Engineer, update Docker environment and build process to support the Django 5 application with its dependencies.
+
+*Acceptance Criteria:*
+- Dockerfile is updated with necessary system packages and build environment variables
+- Docker image builds successfully with all dependencies installed
+- Container startup verification is completed
+- Container image is pushed to ECR
+- ECR vulnerability scan results are reviewed and any critical issues addressed
+
+*Story Points:* 8
+*Priority:* High
+
+---
+
+**STORY-104: ArgoCD Deployment to Sandbox Environment**
+*Description:* As a System Development Engineer, update deployment configurations and deploy Django 5 application to sandbox environment.
+
+*Acceptance Criteria:*
+- Kubernetes manifests are updated for Django 5 application
+- ArgoCD deployment configuration is updated
+- Application is successfully deployed to sandbox environment
+- Application starts up correctly with database connectivity
+- Provide sandbox environment access to development team for functional testing
+- Any deployment issues are documented and resolved
+
+*Story Points:* 5
+*Priority:* High
+
+---
+
+**STORY-105: Production Migration Planning and Documentation**
+*Description:* As a Developer, document the Django 5 migration process, including dependency constraints, and create a production deployment plan.
+
+*Acceptance Criteria:*
+- Comprehensive documentation of package downgrades and reasons for version constraints
+- Production deployment checklist is created
+- Rollback procedures are documented
+- Known limitations and future upgrade paths are documented
+- Migration guide is created for team knowledge sharing
+- Performance and security considerations are documented
+
+*Story Points:* 5
+*Priority:* Medium
