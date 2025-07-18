@@ -45,12 +45,14 @@ kind: ApplicationSet
 metadata:
   name: tenant-applicationset
 spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
   syncPolicy:
     preserveResourcesOnDeletion: true
 
   generators:
     - git:
-        repoURL: https://gitlab.trmsaas.com/openshift/day2ops.git
+        repoURL: git@gitlab.trmsaas.com:openshift/day2ops.git
         revision: main
         files:
           - path: "tenants-discovery/staging-joscor-sandclusters/**/config.yaml"
@@ -67,7 +69,7 @@ spec:
       project: '{{ tenant.argoProject }}'
 
       source:
-        repoURL: https://gitlab.trmsaas.com/openshift/day2ops.git
+        repoURL: git@gitlab.trmsaas.com:openshift/day2ops.git
         targetRevision: '{{ tenant.gitBranch }}'
         path: '{{ tenant.basepath }}/{{ tenant.appfolder_env }}'
 
@@ -94,19 +96,26 @@ spec:
           - RespectIgnoreDifferences=true
 
   templatePatch: |
+    {{- if (ne (.autoSync.enabled | toString) "false") }}
     spec:
-      {{- if (ne (.autoSync.enabled | toString) "false") }}
-      syncPolicy:
-        automated:
-          prune: {{ if (eq (.autoSync.prune | toString) "nil") }}true{{ else }}{{ .autoSync.prune }}{{ end }}
-          selfHeal: {{ if (eq (.autoSync.selfHeal | toString) "nil") }}true{{ else }}{{ .autoSync.selfHeal }}{{ end }}
-        retry:
-          limit: {{ default 6 .retry.limit }}
-          backoff:
-            duration: {{ default "30s" .retry.backoff.duration }}
-            factor: {{ default 2 .retry.backoff.factor }}
-            maxDuration: {{ default "30m" .retry.backoff.maxDuration }}
-      {{- end }}
+      syncPolicy: {{
+        dict
+          "automated" (dict
+            "prune" (default true .autoSync.prune)
+            "selfHeal" (default true .autoSync.selfHeal)
+          )
+          "retry" (dict
+            "limit" (default 6 .retry.limit)
+            "backoff" (dict
+              "duration" (default "30s" .retry.backoff.duration)
+              "factor" (default 2 .retry.backoff.factor)
+              "maxDuration" (default "30m" .retry.backoff.maxDuration)
+            )
+          )
+        | toJson
+      }}
+    {{- end }}
+
 ```
 
 ---
