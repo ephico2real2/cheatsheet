@@ -116,6 +116,23 @@ spec:
       }}
     {{- end }}
 
+###
+  templatePatch: |
+    {{- if (ne (.autoSync.enabled | toString) "false") }}
+    spec:
+      syncPolicy:
+        automated:
+          prune: {{- if hasKey .autoSync "prune" }}{{ .autoSync.prune }}{{ else }}true{{ end }}
+          selfHeal: {{- if hasKey .autoSync "selfHeal" }}{{ .autoSync.selfHeal }}{{ else }}true{{ end }}
+        retry:
+          limit: {{ default 6 .retry.limit }}
+          backoff:
+            duration: {{ default "30s" .retry.backoff.duration }}
+            factor: {{ default 2 .retry.backoff.factor }}
+            maxDuration: {{ default "30m" .retry.backoff.maxDuration }}
+    {{- end }}
+
+
 ```
 
 ---
