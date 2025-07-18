@@ -57,23 +57,23 @@ spec:
 
   template:
     metadata:
-      name: '{{tenant.app_id}}'
+      name: '{{ tenant.app_id }}'
       labels:
-        type: '{{tenant.appType}}'
+        type: '{{ tenant.appType }}'
       annotations:
         argocd.argoproj.io/manifest-generate-paths: ".,.."
 
     spec:
-      project: '{{tenant.argoProject}}'
+      project: '{{ tenant.argoProject }}'
 
       source:
         repoURL: https://gitlab.trmsaas.com/openshift/day2ops.git
-        targetRevision: '{{tenant.gitBranch}}'
-        path: '{{tenant.basepath}}/{{tenant.appfolder_env}}'
+        targetRevision: '{{ tenant.gitBranch }}'
+        path: '{{ tenant.basepath }}/{{ tenant.appfolder_env }}'
 
       destination:
-        server: '{{k8s_cluster.targetClusterName}}'
-        namespace: '{{k8s_cluster.targetNamespace}}'
+        server: '{{ k8s_cluster.targetClusterName }}'
+        namespace: '{{ k8s_cluster.targetNamespace }}'
 
       ignoreDifferences:
         - kind: "ServiceAccount"
@@ -100,7 +100,6 @@ spec:
         automated:
           prune: {{ if (eq (.autoSync.prune | toString) "nil") }}true{{ else }}{{ .autoSync.prune }}{{ end }}
           selfHeal: {{ if (eq (.autoSync.selfHeal | toString) "nil") }}true{{ else }}{{ .autoSync.selfHeal }}{{ end }}
-
         retry:
           limit: {{ default 6 .retry.limit }}
           backoff:
