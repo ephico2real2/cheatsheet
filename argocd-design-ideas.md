@@ -59,23 +59,24 @@ spec:
 
   template:
     metadata:
-      name: '{{ tenant.app_id }}'
+      name: '{{ .tenant.app_id }}'
       labels:
-        type: '{{ tenant.appType }}'
+        type: '{{ .tenant.appType }}'
+        maintainer: '{{ .tenant.maintainer }}'
       annotations:
         argocd.argoproj.io/manifest-generate-paths: ".,.."
 
     spec:
-      project: '{{ tenant.argoProject }}'
+      project: '{{ .tenant.argoProject }}'
 
       source:
-        repoURL: git@gitlab.trmsaas.com:openshift/day2ops.git
-        targetRevision: '{{ tenant.gitBranch }}'
-        path: '{{ tenant.basepath }}/{{ tenant.appfolder_env }}'
+        repoURL: '{{ .tenant.gitRepoURL }}'
+        targetRevision: '{{ .tenant.gitBranch }}'
+        path: '{{ .tenant.basepath }}/{{ .tenant.appfolder_env }}'
 
       destination:
-        server: '{{ k8s_cluster.targetClusterName }}'
-        namespace: '{{ k8s_cluster.targetNamespace }}'
+        server: '{{ .k8s_cluster.targetClusterName }}'
+        namespace: '{{ .k8s_cluster.targetNamespace }}'
 
       ignoreDifferences:
         - kind: "ServiceAccount"
@@ -98,32 +99,10 @@ spec:
   templatePatch: |
     {{- if (ne (.autoSync.enabled | toString) "false") }}
     spec:
-      syncPolicy: {{
-        dict
-          "automated" (dict
-            "prune" (default true .autoSync.prune)
-            "selfHeal" (default true .autoSync.selfHeal)
-          )
-          "retry" (dict
-            "limit" (default 6 .retry.limit)
-            "backoff" (dict
-              "duration" (default "30s" .retry.backoff.duration)
-              "factor" (default 2 .retry.backoff.factor)
-              "maxDuration" (default "30m" .retry.backoff.maxDuration)
-            )
-          )
-        | toJson
-      }}
-    {{- end }}
-
-###
-  templatePatch: |
-    {{- if (ne (.autoSync.enabled | toString) "false") }}
-    spec:
       syncPolicy:
         automated:
-          prune: {{- if hasKey .autoSync "prune" }}{{ .autoSync.prune }}{{ else }}true{{ end }}
-          selfHeal: {{- if hasKey .autoSync "selfHeal" }}{{ .autoSync.selfHeal }}{{ else }}true{{ end }}
+          prune: {{ if hasKey .autoSync "prune" }}{{ .autoSync.prune }}{{ else }}false{{ end }}
+          selfHeal: {{ if hasKey .autoSync "selfHeal" }}{{ .autoSync.selfHeal }}{{ else }}true{{ end }}
         retry:
           limit: {{ default 6 .retry.limit }}
           backoff:
@@ -131,8 +110,6 @@ spec:
             factor: {{ default 2 .retry.backoff.factor }}
             maxDuration: {{ default "30m" .retry.backoff.maxDuration }}
     {{- end }}
-
-
 ```
 
 ---
