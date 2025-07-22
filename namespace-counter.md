@@ -1,6 +1,6 @@
-## working 
+## working
 
-```bash
+```sh
 #!/bin/bash
 
 # OpenShift Multi-Cluster Namespace Counter - Shell Script Version
@@ -376,7 +376,15 @@ save_results() {
     local user=$(oc whoami 2>/dev/null)
     local namespace_count=$(get_namespace_count)
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    local filename="namespace-count-$(date +%Y%m%d-%H%M%S).json"
+    
+    # Extract cluster name from server URL for filename
+    local cluster_name="unknown"
+    if [[ -n "$server" ]]; then
+        # Extract hostname from URL (e.g., api.cluster.example.com from https://api.cluster.example.com:6443)
+        cluster_name=$(echo "$server" | sed 's|https\?://||' | sed 's|:.*||' | sed 's/api\.//')
+    fi
+    
+    local filename="namespace-count-${cluster_name}-$(date +%Y%m%d-%H%M).json"
     
     # Get categorized node information for JSON
     local all_nodes=$(oc get nodes --no-headers -o custom-columns="NAME:.metadata.name,ROLES:.metadata.labels" 2>/dev/null)
@@ -515,7 +523,15 @@ generate_html_report() {
     local user=$(oc whoami 2>/dev/null)
     local namespace_count=$(get_namespace_count)
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    local filename="namespace-report-$(date +%Y%m%d-%H%M%S).html"
+    
+    # Extract cluster name from server URL for filename
+    local cluster_name="unknown"
+    if [[ -n "$server" ]]; then
+        # Extract hostname from URL (e.g., api.cluster.example.com from https://api.cluster.example.com:6443)
+        cluster_name=$(echo "$server" | sed 's|https\?://||' | sed 's|:.*||' | sed 's/api\.//')
+    fi
+    
+    local filename="namespace-report-${cluster_name}-$(date +%Y%m%d-%H%M).html"
     
     # Get categorized node information for HTML
     local all_nodes=$(oc get nodes --no-headers -o custom-columns="NAME:.metadata.name,ROLES:.metadata.labels" 2>/dev/null)
@@ -723,8 +739,8 @@ show_usage() {
     echo "Examples:"
     echo "  $0                                    # Use current login"
     echo "  $0 --url https://api.cluster.com:6443 -u myuser"
-    echo "  $0 --details --save"
-    echo "  $0 --details --format html"
+    echo "  $0 --details --save                   # Saves namespace-count-cluster.com-20240122-1430.json"
+    echo "  $0 --details --format html            # Creates namespace-report-cluster.com-20240122-1430.html"
     echo "  $0 --url https://api.cluster.com:6443 --details --format html"
 }
 
@@ -864,6 +880,4 @@ main() {
 
 # Run main function with all arguments
 main "$@"
-
-
 ```
