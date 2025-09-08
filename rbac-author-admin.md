@@ -1,10 +1,9 @@
-There are two options:
+GitHub/Markdown viewers.
+
 
 ---
 
-Option A — ClusterRole + RoleBinding (scoped to one namespace)
-
-Create a ClusterRole that grants RBAC authoring verbs, then bind it in the target namespace to your OpenShift user.
+🔹 Option A — ClusterRole + RoleBinding (scoped to connectedcargo)
 
 # ClusterRole: can create/manage Roles and RoleBindings
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15,9 +14,7 @@ rules:
 - apiGroups: ["rbac.authorization.k8s.io"]
   resources: ["roles", "rolebindings"]
   verbs: ["create","get","list","watch","update","patch","delete"]
-
-Bind it only in connectedcargo to the user (replace the username below):
-
+---
 # RoleBinding: limit the ClusterRole's power to the connectedcargo namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -25,22 +22,18 @@ metadata:
   name: rbac-author-admin
   namespace: connectedcargo
 subjects:
-- kind: User                # or Group/ServiceAccount as needed
-  name: alice@example.com   # <-- your OpenShift username
+- kind: User                # Or Group/ServiceAccount if needed
+  name: alice@example.com   # <-- replace with your OpenShift username
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
   name: rbac-author-admin
   apiGroup: rbac.authorization.k8s.io
 
-Why this works: A ClusterRole is reusable and can be bound with a namespaced RoleBinding to restrict its effect to just that namespace.
-
 
 ---
 
-Option B — (Often simpler) Role + RoleBinding (namespaced only)
-
-If you only ever need this in connectedcargo, you can skip the ClusterRole and just use a namespaced Role.
+🔹 Option B — Role + RoleBinding (namespace-scoped only)
 
 # Role: namespace-scoped capability to manage Roles/RoleBindings
 apiVersion: rbac.authorization.k8s.io/v1
@@ -53,7 +46,7 @@ rules:
   resources: ["roles", "rolebindings"]
   verbs: ["create","get","list","watch","update","patch","delete"]
 ---
-# RoleBinding: grant to the user
+# RoleBinding: grant Role to the user
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -61,7 +54,7 @@ metadata:
   namespace: connectedcargo
 subjects:
 - kind: User
-  name: alice@example.com   # <-- your OpenShift username
+  name: alice@example.com   # <-- replace with your OpenShift username
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
@@ -71,18 +64,20 @@ roleRef:
 
 ---
 
-Minimal vs. full verbs
+🔧 Tips
 
-If you only want to allow creation, change verbs to ["create"].
+Minimal verbs: if you only want “create”, set verbs: ["create"].
 
-In practice, teams usually need update/patch/delete to manage/fix RBAC they create, so I included the full set.
-
-
-Binding to Groups instead of Users
-
-If you manage access via LDAP/Groups, switch the subject:
+Groups instead of Users:
 
 subjects:
 - kind: Group
-  name: app-ocp-rbac-<team>-ns-admin   # for example
+  name: app-ocp-rbac-team-ns-admin
   apiGroup: rbac.authorization.k8s.io
+
+
+
+---
+
+workflow — a reusable ClusterRole (Option A) or a strictly namespace-only Role (Option B)?
+
